@@ -247,10 +247,34 @@ class nfcappPurchaseNewApi(http.Controller):
                 nfcapp_farmer_json['active'] = farmer.active
                 nfcapp_farmer_json['no_ktp'] = farmer.no_ktp
                 nfcapp_farmer_json['bank_akun'] = farmer.bank_akun
+                nfcapp_farmer_json['certification_status_id'] = farmer.certification_status_id.id
                 nfcapp_farmer_json['bank_holder'] = farmer.bank_holder
                 nfcapp_farmer_json['bank_name_name'] = farmer.bank_name_id.name if farmer.bank_name_id else None
                 nfcapp_farmer_json['odoo_id'] = farmer.id
 
+                commodity_arr = []
+                data_commodity = request.env['nfcapp.commodityitem'].sudo().search([('certStatus','in',farmer.certification_status_id.id)])
+                for commodity in data_commodity:
+                    commodity_json = {}
+                    commodity_json['farmer_id'] = farmer.id
+                    commodity_json['id'] = commodity.id
+                    commodity_json['code'] = commodity.code
+                    commodity_json['price'] = commodity.price
+                    commodity_json['commodity_id'] = commodity.commodity_id.id if commodity.commodity_id else None
+                    commodity_json['commodity_name'] = commodity.commodity_id.name if commodity.commodity_id else None
+                    commodity_json['variant'] = commodity.variant
+                    commodity_json['packing'] = commodity.packing
+                    commodity_json['product_id'] = commodity.product_id.id if commodity.product_id else None
+                    commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
+                    commodity_json['odoo_id'] = commodity.id
+                    commodity_json['certStatus'] = str(commodity.certStatus.ids)
+
+
+                    commodity_arr.append(commodity_json)
+
+                nfcapp_farmer_json['commodity_items'] = commodity_arr
+
+                print(nfcapp_farmer_json)
                 nfcapp_farmer_arr.append(nfcapp_farmer_json)
 
             result = json.dumps(nfcapp_farmer_arr, default=str, indent=4, sort_keys=True)
