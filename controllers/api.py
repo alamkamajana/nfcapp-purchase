@@ -20,6 +20,9 @@ class nfcappPurchaseNewApi(http.Controller):
         except :
             return False
 
+
+
+
     @http.route('/api/purchase/login', methods=['POST', 'OPTIONS'], type='json', cors="*", auth="none", csrf=False)
     def nfcapp_api_purchase_login(self, **params):
         try:
@@ -123,9 +126,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 product_json['item_code'] = product.itemcode
                 product_json['commodity'] = product.commodity
                 product_json['odoo_id'] = product.id
+                product_json['write_date'] = product.write_date
+
                 product_arr.append(product_json)
 
-            result = json.dumps(product_arr)
+            result = json.dumps(product_arr,default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e :
@@ -237,6 +242,8 @@ class nfcappPurchaseNewApi(http.Controller):
                 nfcapp_farmer_json['id'] = farmer.id
                 nfcapp_farmer_json['parent_id'] = farmer.parent_id.id if farmer.parent_id else None
                 nfcapp_farmer_json['parent_name'] = farmer.parent_id.name if farmer.parent_id else None
+                nfcapp_farmer_json['station_id'] = farmer.parent_id.station_id.id if farmer.parent_id.station_id else None
+                nfcapp_farmer_json['station_name'] = farmer.parent_id.station_id.name if farmer.parent_id.station_id else None
                 nfcapp_farmer_json['code'] = farmer.code
                 nfcapp_farmer_json['farmer_name'] = farmer.farmer_name
                 nfcapp_farmer_json['farmer_role'] = farmer.farmer_role
@@ -249,6 +256,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 nfcapp_farmer_json['no_ktp'] = farmer.no_ktp
                 nfcapp_farmer_json['bank_akun'] = farmer.bank_akun
                 nfcapp_farmer_json['certification_status_id'] = farmer.certification_status_id.id
+                nfcapp_farmer_json['certification_status_name'] = farmer.certification_status_id.name
                 nfcapp_farmer_json['bank_holder'] = farmer.bank_holder
                 nfcapp_farmer_json['bank_name_name'] = farmer.bank_name_id.name if farmer.bank_name_id else None
                 nfcapp_farmer_json['odoo_id'] = farmer.id
@@ -261,16 +269,20 @@ class nfcappPurchaseNewApi(http.Controller):
                     commodity_json['farmer_id'] = farmer.id
                     commodity_json['id'] = commodity.id
                     commodity_json['code'] = commodity.code
+                    commodity_json['desc'] = commodity.desc
                     commodity_json['price'] = commodity.price
                     commodity_json['commodity_id'] = commodity.commodity_id.id if commodity.commodity_id else None
                     commodity_json['commodity_name'] = commodity.commodity_id.name if commodity.commodity_id else None
                     commodity_json['variant'] = commodity.variant
                     commodity_json['packing'] = commodity.packing
                     commodity_json['product_id'] = commodity.product_id.id if commodity.product_id else None
+                    commodity_json['product_id_code'] = commodity.product_id.itemcode if commodity.product_id else None
+                    commodity_json['product_id_name'] = commodity.product_id.name if commodity.product_id else None
                     commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
                     commodity_json['odoo_id'] = commodity.id
                     commodity_json['certStatus'] = str(commodity.certStatus.ids)
                     commodity_json['write_date'] = commodity.write_date
+                    # print(commodity_x/json)
 
                     commodity_arr.append(commodity_json)
 
@@ -312,10 +324,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 res_user_json['employee_id'] = user.employee_id.id if user.employee_id else None
                 res_user_json['employee_name'] = user.employee_id.name if user.employee_id else None
                 res_user_json['odoo_id'] = user.id
+                res_user_json['write_date'] = user.write_date
 
                 res_user_arr.append(res_user_json)
 
-            result = json.dumps(res_user_arr)
+            result = json.dumps(res_user_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e :
@@ -339,10 +352,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 commodity_json['station_id'] = commodity.station_id.id if commodity.station_id else None
                 commodity_json['station_name'] = commodity.station_id.name if commodity.station_id else None
                 commodity_json['odoo_id'] = commodity.id
+                commodity_json['write_date'] = commodity.write_date
 
                 commodity_arr.append(commodity_json)
 
-            result = json.dumps(commodity_arr)
+            result = json.dumps(commodity_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -371,10 +385,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 commodity_json['product_id'] = commodity.product_id.id if commodity.product_id else None
                 commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
                 commodity_json['odoo_id'] = commodity.id
+                commodity_json['write_date'] = commodity.write_date
 
                 commodity_arr.append(commodity_json)
 
-            result = json.dumps(commodity_arr)
+            result = json.dumps(commodity_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -400,10 +415,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 station_json['gps_longitude'] = station.gps_longitude
                 station_json['is_testing'] = station.is_testing
                 station_json['odoo_id'] = station.id
+                station_json['write_date'] = station.write_date
 
                 station_arr.append(station_json)
 
-            result = json.dumps(station_arr)
+            result = json.dumps(station_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -429,9 +445,10 @@ class nfcappPurchaseNewApi(http.Controller):
                 cluster_json['coordinator'] = cluster.coordinator
                 cluster_json['code'] = cluster.code
                 cluster_json['odoo_id'] = cluster.id
+                cluster_json['write_date'] = cluster.write_date
                 cluster_arr.append(cluster_json)
 
-            result = json.dumps(cluster_arr)
+            result = json.dumps(cluster_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -472,3 +489,4 @@ class nfcappPurchaseNewApi(http.Controller):
         except Exception as e:
             print(e)
             return e
+
