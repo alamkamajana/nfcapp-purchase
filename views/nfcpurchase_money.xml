@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="nfcpurchase_money_tree_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.money.tree.view</field>
+        <field name="model">nfcpurchase.money</field>
+        <field name="arch" type="xml">
+            <tree string="Money">
+                <field name="uniq_id"/>
+                <field name="change_id"/>
+                <field name="number"/>
+                <field name="purchase_event_id"/>
+                <field name="purchase_order_id"/>
+                <field name="amount"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_nfcpurchase_money">
+        <field name="name">Money</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">nfcpurchase.money</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Money" id="menu_nfcpurchase_money" parent="menu_child_nfcpurchase"
+              action="action_nfcpurchase_money"
+              sequence="60"/>
+
+</odoo>

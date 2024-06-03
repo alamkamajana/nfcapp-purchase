@@ -1,23 +1,31 @@
 {
-    'name': "Nfcapp New Purchase",
+    "name": "Nfcapp New Purchase",
 
-    'summary': """
+    "summary": """
         New Purchase Applications For SAD""",
 
-    'tag': """
+    "tag": """
         nfcapp
     """,
 
-    'author': "ALAM",
-    'website': "https://www.alamkamajana.com",
+    "author": "ALAM",
+    "website": "https://www.alamkamajana.com",
 
-    'category': 'sad',
-    'version': '1',
+    "category": "sad",
+    "version": "1",
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr','nfcapp'],
+    "depends": ["base", "hr","nfcapp"],
 
     # always loaded
-    'data': [ ],
+    "data": [
+        "security/ir.model.access.csv",
+        "views/nfcpurchase_views.xml",
+        "views/nfcpurchase_purchase_order.xml",
+        "views/nfcpurchase_purchase_order_line.xml",
+        "views/nfcpurchase_payment.xml",
+        "views/nfcpurchase_delivery_order.xml",
+        "views/nfcpurchase_money.xml",
+    ],
 
 }
