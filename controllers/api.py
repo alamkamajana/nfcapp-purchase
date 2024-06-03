@@ -242,8 +242,13 @@ class nfcappPurchaseNewApi(http.Controller):
             if not nfcapp_check_access:
                 return False
 
+            if params.get("odoo_id"):
+                odoo_id = int(params.get("odoo_id"))
+                data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().browse(odoo_id)
+            else:
+                data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().search([], order="id asc")
+
             nfcapp_farmer_arr = []
-            data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().search([], order="id asc")
             for farmer in data_nfcapp_farmer :
                 nfcapp_farmer_json = {}
                 nfcapp_farmer_json['id'] = farmer.id
