@@ -16,6 +16,11 @@ def format_str_to_date(date_string, date_format='%Y-%m-%d %H:%M:%S'):
     return datetime.strptime(date_string, date_format) if date_string else None
 
 
+MAPPED_FLASK_ODOO_MODEL = {
+    'NfcappFarmerOdoo': 'nfcapp.farmer',
+}
+
+
 class nfcappPurchaseNewApi(http.Controller):
     def _check_nfcap_user_authentication(self, token):
         try :
@@ -483,3 +488,30 @@ class nfcappPurchaseNewApi(http.Controller):
         except Exception as e:
             print(e)
             return e
+
+
+    @http.route('/nfcapp-purchase/check-write-date', csrf=False, cors="*", type='http', auth="none")
+    def check_write_date(self, **params):
+        token = params.get("token")
+        odoo_user_id = params.get("odoo_user_id")
+        nfcapp_check_access = self._check_nfcap_user_authentication(token)
+        if not nfcapp_check_access:
+            return False
+
+        model_name = params.get("model")
+        odoo_id = int(params.get("odoo_id"))
+        odoo_model_name = MAPPED_FLASK_ODOO_MODEL.get(model_name)
+        odoo_model = request.env[odoo_model_name].sudo().browse(odoo_id)
+
+        if not odoo_model:
+            return False
+
+        check_date = format_str_to_date(params.get('write_date'))
+        write_date_odoo = odoo_model.write_date.replace(microsecond=0) if odoo_model.write_date else None
+        if check_date != write_date_odoo:
+            result = {"update": True}
+        else:
+            result = {"update": False}
+
+        response = Response(json.dumps(result), content_type='application/json;charset=utf-8', status=200)
+        return response
