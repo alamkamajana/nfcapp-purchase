@@ -5,6 +5,15 @@ import random
 from werkzeug.utils import redirect
 from odoo import http
 from odoo.http import request, Response
+from datetime import datetime
+
+
+def format_date_obj(date_obj):
+    return date_obj.strftime('%Y-%m-%d %H:%M:%S') if date_obj else None
+
+
+def format_str_to_date(date_string, date_format='%Y-%m-%d %H:%M:%S'):
+    return datetime.strptime(date_string, date_format) if date_string else None
 
 
 class nfcappPurchaseNewApi(http.Controller):
@@ -50,10 +59,8 @@ class nfcappPurchaseNewApi(http.Controller):
                 for stt in user_station:
                     station_dict = {
                         "id": stt.id,
-                        "created": stt.create_date.strftime(
-                            '%Y-%m-%d %H:%M:%S') if stt.create_date else None,
-                        "modified": stt.write_date.strftime(
-                            '%Y-%m-%d %H:%M:%S') if stt.write_date else None,
+                        "created": format_date_obj(stt.create_date),
+                        "modified": format_date_obj(stt.write_date),
                         "name": stt.name,
                         "province": stt.province,
                         "gps_latitude": stt.gps_latitude,
@@ -123,6 +130,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 product_json['item_code'] = product.itemcode
                 product_json['commodity'] = product.commodity
                 product_json['odoo_id'] = product.id
+                product_json['write_date'] = format_date_obj(product.write_date)
                 product_arr.append(product_json)
 
             result = json.dumps(product_arr)
@@ -167,11 +175,10 @@ class nfcappPurchaseNewApi(http.Controller):
                 po_json['user_name'] = po.user_id.name if po.user_id else None
                 po_json['payment_term_name'] = po.payment_term_id.name if po.payment_term_id else None
                 po_json['odoo_id'] = po.id
-                po_json['write_date'] = po.write_date
+                po_json['write_date'] = format_date_obj(po.write_date)
                 po_arr.append(po_json)
 
             result = json.dumps(po_arr, default=str, indent=4, sort_keys=True)
-            print(result)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e :
@@ -211,7 +218,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 po_line_json['order_id'] = po_line.order_id.id if po_line.order_id else None
                 po_line_json['order_name'] = po_line.order_id.name if po_line.order_id else None
                 po_line_json['odoo_id'] = po_line.id
-                po_line_json['write_date'] = po_line.write_date
+                po_line_json['write_date'] = format_date_obj(po_line.write_date)
 
                 po_line_arr.append(po_line_json)
 
@@ -252,8 +259,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 nfcapp_farmer_json['bank_holder'] = farmer.bank_holder
                 nfcapp_farmer_json['bank_name_name'] = farmer.bank_name_id.name if farmer.bank_name_id else None
                 nfcapp_farmer_json['odoo_id'] = farmer.id
-                nfcapp_farmer_json['write_date'] = farmer.write_date
-
+                nfcapp_farmer_json['write_date'] = format_date_obj(farmer.write_date)
                 commodity_arr = []
                 data_commodity = request.env['nfcapp.commodityitem'].sudo().search([('certStatus','in',farmer.certification_status_id.id)])
                 for commodity in data_commodity:
@@ -270,7 +276,7 @@ class nfcappPurchaseNewApi(http.Controller):
                     commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
                     commodity_json['odoo_id'] = commodity.id
                     commodity_json['certStatus'] = str(commodity.certStatus.ids)
-                    commodity_json['write_date'] = commodity.write_date
+                    commodity_json['write_date'] = format_date_obj(commodity.write_date)
 
                     commodity_arr.append(commodity_json)
 
@@ -312,6 +318,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 res_user_json['employee_id'] = user.employee_id.id if user.employee_id else None
                 res_user_json['employee_name'] = user.employee_id.name if user.employee_id else None
                 res_user_json['odoo_id'] = user.id
+                res_user_json['write_date'] = format_date_obj(user.write_date)
 
                 res_user_arr.append(res_user_json)
 
@@ -339,6 +346,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 commodity_json['station_id'] = commodity.station_id.id if commodity.station_id else None
                 commodity_json['station_name'] = commodity.station_id.name if commodity.station_id else None
                 commodity_json['odoo_id'] = commodity.id
+                commodity_json['write_date'] = format_date_obj(commodity.write_date)
 
                 commodity_arr.append(commodity_json)
 
@@ -371,6 +379,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 commodity_json['product_id'] = commodity.product_id.id if commodity.product_id else None
                 commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
                 commodity_json['odoo_id'] = commodity.id
+                commodity_json['write_date'] = format_date_obj(commodity.write_date)
 
                 commodity_arr.append(commodity_json)
 
@@ -400,6 +409,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 station_json['gps_longitude'] = station.gps_longitude
                 station_json['is_testing'] = station.is_testing
                 station_json['odoo_id'] = station.id
+                station_json['write_date'] = format_date_obj(station.write_date)
 
                 station_arr.append(station_json)
 
@@ -429,6 +439,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 cluster_json['coordinator'] = cluster.coordinator
                 cluster_json['code'] = cluster.code
                 cluster_json['odoo_id'] = cluster.id
+                cluster_json['write_date'] = format_date_obj(cluster.write_date)
                 cluster_arr.append(cluster_json)
 
             result = json.dumps(cluster_arr)
