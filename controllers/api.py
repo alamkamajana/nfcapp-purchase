@@ -18,6 +18,7 @@ def format_str_to_date(date_string, date_format='%Y-%m-%d %H:%M:%S'):
 
 MAPPED_FLASK_ODOO_MODEL = {
     'NfcappFarmerOdoo': 'nfcapp.farmer',
+    'PurchaseOrderOdoo': 'purchase.order',
 }
 
 
@@ -104,7 +105,6 @@ class nfcappPurchaseNewApi(http.Controller):
                 ('partner_id', '=', odoo_user.partner_id.id)
             ])
             product_po = []
-            purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
             po_arr = []
             for po in purchase_orders:
                 po_arr.append(po.id)
@@ -155,11 +155,17 @@ class nfcappPurchaseNewApi(http.Controller):
                 return False
 
             odoo_user = request.env['res.users'].sudo().browse(int(odoo_user_id))
-            followers = request.env['mail.followers'].search([
-                ('res_model', '=', 'purchase.order'),
-                ('partner_id', '=', odoo_user.partner_id.id)
-            ])
-            purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
+
+            if params.get("odoo_id"):
+                odoo_id = int(params.get("odoo_id"))
+                purchase_orders = request.env['purchase.order'].sudo().browse(odoo_id)
+            else:
+                followers = request.env['mail.followers'].search([
+                    ('res_model', '=', 'purchase.order'),
+                    ('partner_id', '=', odoo_user.partner_id.id)
+                ])
+                purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
+
             po_arr = []
             for po in purchase_orders :
                 po_json = {}
