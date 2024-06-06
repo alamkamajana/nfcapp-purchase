@@ -15,3 +15,5 @@ class PurchaseOrder(models.Model):
     status = fields.Char(string="Status")
     purchase_event_id = fields.Integer(string="Purchase Event ID")
     is_paid = fields.Boolean(string="Paid")
+    signature = fields.Binary(string="Signature")
+    filename = fields.Char(default="image.png")
