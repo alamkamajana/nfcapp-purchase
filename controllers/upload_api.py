@@ -40,12 +40,12 @@ class nfcappPurchaseNewUploadApi(http.Controller):
         json_data = request.jsonrequest
         token = json_data.get("token")
         if not token or not self._check_nfcapp_user_authentication(token):
-            return {"message": "Unauthorized", "status": 401}
+            return json.dumps({"message": "Unauthorized", "status": 401})
 
         model = json_data.get("model")
         odoo_model_name = MAPPED_FLASK_ODOO_MODEL.get(model)
         if not odoo_model_name:
-            return {"message": "Invalid model", "status": 400}
+            return json.dumps({"message": "Invalid model", "status": 400})
 
         odoo_model = request.env[odoo_model_name]
         uniq_ids_to_create = []
