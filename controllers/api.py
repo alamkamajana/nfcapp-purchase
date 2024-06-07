@@ -6,13 +6,14 @@ from werkzeug.utils import redirect
 from odoo import http
 from odoo.http import request, Response
 from datetime import datetime
+from werkzeug.exceptions import NotFound
 
 
 def format_date_obj(date_obj):
-    return date_obj.strftime('%Y-%m-%d %H:%M:%S') if date_obj else None
+    return date_obj.strftime('%Y-%m-%d %H:%M:%S.%f') if date_obj else None
 
 
-def format_str_to_date(date_string, date_format='%Y-%m-%d %H:%M:%S'):
+def format_str_to_date(date_string, date_format='%Y-%m-%d %H:%M:%S.%f'):
     return datetime.strptime(date_string, date_format) if date_string else None
 
 
@@ -105,6 +106,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 ('partner_id', '=', odoo_user.partner_id.id)
             ])
             product_po = []
+            purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
             po_arr = []
             for po in purchase_orders:
                 po_arr.append(po.id)
@@ -507,22 +509,22 @@ class nfcappPurchaseNewApi(http.Controller):
         odoo_user_id = params.get("odoo_user_id")
         nfcapp_check_access = self._check_nfcap_user_authentication(token)
         if not nfcapp_check_access:
-            return False
+            return Response("Unauthorized", status=401)
 
         model_name = params.get("model")
         odoo_id = int(params.get("odoo_id"))
         odoo_model_name = MAPPED_FLASK_ODOO_MODEL.get(model_name)
         odoo_model = request.env[odoo_model_name].sudo().browse(odoo_id)
 
-        if not odoo_model:
-            return False
+        if not odoo_model.exists():
+            return NotFound("Record not found!.")
 
         check_date = format_str_to_date(params.get('write_date'))
-        write_date_odoo = odoo_model.write_date.replace(microsecond=0) if odoo_model.write_date else None
+        write_date_odoo = odoo_model.write_date if odoo_model.write_date else None
         if check_date != write_date_odoo:
-            result = {"update": True}
+            result = {"update": True, "status": 200}
         else:
-            result = {"update": False}
+            result = {"update": False, "status": 200}
 
         response = Response(json.dumps(result), content_type='application/json;charset=utf-8', status=200)
         return response
