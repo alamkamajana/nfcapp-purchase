@@ -11,6 +11,12 @@
                 <field name="qty"/>
                 <field name="unit_price"/>
                 <field name="barcode"/>
+                <field name="commodity_name"/>
+                <field name="variant"/>
+                <field name="is_organic"/>
+                <field name="is_ra_cert"/>
+                <field name="color_name"/>
+                <field name="color_hex"/>
                 <field name="subtotal"/>
                 <field name="currency"/>
                 <field name="delivery_order_id"/>

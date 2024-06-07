@@ -14,8 +14,7 @@
                 <field name="status"/>
                 <field name="purchase_event_id"/>
                 <field name="is_paid"/>
-                <field name="filename"/>
-                <field name="signature" widget="image" filename="filename" options="{'preview_image': 'signature'}"/>
+                <field name="date"/>
             </tree>
         </field>
     </record>

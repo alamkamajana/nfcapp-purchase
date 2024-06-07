@@ -11,9 +11,12 @@
                 <field name="driver"/>
                 <field name="vehicle_number"/>
                 <field name="purchase_event_id"/>
-                <field name="date"/>
+                <field name="sent_date"/>
+                <field name="received_date"/>
+                <field name="origin"/>
                 <field name="destination"/>
                 <field name="note"/>
+                <field name="status"/>
             </tree>
         </field>
     </record>
