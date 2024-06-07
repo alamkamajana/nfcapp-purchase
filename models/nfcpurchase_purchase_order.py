@@ -17,3 +17,4 @@ class PurchaseOrder(models.Model):
     is_paid = fields.Boolean(string="Paid")
     signature = fields.Binary(string="Signature")
     filename = fields.Char(default="image.png")
+    date = fields.Date(string="Date")

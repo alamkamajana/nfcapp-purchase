@@ -9,6 +9,7 @@ class PurchaseOrderLine(models.Model):
     change_id = fields.Char(string='Change ID', index=True)
 
     product_odoo_id = fields.Integer(string="Product Odoo")
+    # nfcapp_commodity_item_odoo_id = fields.Integer()
     qty = fields.Float(string="Quantity")
     unit_price = fields.Float(string="Unit Price")
     barcode = fields.Char(string="Barcode")
@@ -16,3 +17,10 @@ class PurchaseOrderLine(models.Model):
     currency = fields.Char(string="Currency")
     delivery_order_id = fields.Integer(string="Delivery Order")
     purchase_order_id = fields.Integer(string="Purchase Order")
+    commodity_name = fields.Char(string="Commodity Name")
+    variant = fields.Char(string="Variant")
+    is_organic = fields.Boolean("Is Organic")
+    is_ra_cert = fields.Boolean()
+    color_name = fields.Char(string="Color Name")
+    color_hex = fields.Char(string="Color HEX")
+    note = fields.Text(string="Note")
