@@ -5,22 +5,6 @@ import random
 from werkzeug.utils import redirect
 from odoo import http
 from odoo.http import request, Response
-from datetime import datetime
-from werkzeug.exceptions import NotFound
-
-
-def format_date_obj(date_obj):
-    return date_obj.strftime('%Y-%m-%d %H:%M:%S.%f') if date_obj else None
-
-
-def format_str_to_date(date_string, date_format='%Y-%m-%d %H:%M:%S.%f'):
-    return datetime.strptime(date_string, date_format) if date_string else None
-
-
-MAPPED_FLASK_ODOO_MODEL = {
-    'NfcappFarmerOdoo': 'nfcapp.farmer',
-    'PurchaseOrderOdoo': 'purchase.order',
-}
 
 
 class nfcappPurchaseNewApi(http.Controller):
@@ -35,6 +19,9 @@ class nfcappPurchaseNewApi(http.Controller):
                 return False
         except :
             return False
+
+
+
 
     @http.route('/api/purchase/login', methods=['POST', 'OPTIONS'], type='json', cors="*", auth="none", csrf=False)
     def nfcapp_api_purchase_login(self, **params):
@@ -66,8 +53,10 @@ class nfcappPurchaseNewApi(http.Controller):
                 for stt in user_station:
                     station_dict = {
                         "id": stt.id,
-                        "created": format_date_obj(stt.create_date),
-                        "modified": format_date_obj(stt.write_date),
+                        "created": stt.create_date.strftime(
+                            '%Y-%m-%d %H:%M:%S') if stt.create_date else None,
+                        "modified": stt.write_date.strftime(
+                            '%Y-%m-%d %H:%M:%S') if stt.write_date else None,
                         "name": stt.name,
                         "province": stt.province,
                         "gps_latitude": stt.gps_latitude,
@@ -137,10 +126,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 product_json['item_code'] = product.itemcode
                 product_json['commodity'] = product.commodity
                 product_json['odoo_id'] = product.id
-                product_json['write_date'] = format_date_obj(product.write_date)
+                product_json['write_date'] = product.write_date
+
                 product_arr.append(product_json)
 
-            result = json.dumps(product_arr)
+            result = json.dumps(product_arr,default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e :
@@ -157,17 +147,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 return False
 
             odoo_user = request.env['res.users'].sudo().browse(int(odoo_user_id))
-
-            if params.get("odoo_id"):
-                odoo_id = int(params.get("odoo_id"))
-                purchase_orders = request.env['purchase.order'].sudo().browse(odoo_id)
-            else:
-                followers = request.env['mail.followers'].search([
-                    ('res_model', '=', 'purchase.order'),
-                    ('partner_id', '=', odoo_user.partner_id.id)
-                ])
-                purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
-
+            followers = request.env['mail.followers'].search([
+                ('res_model', '=', 'purchase.order'),
+                ('partner_id', '=', odoo_user.partner_id.id)
+            ])
+            purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
             po_arr = []
             for po in purchase_orders :
                 po_json = {}
@@ -231,7 +215,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 po_line_json['order_id'] = po_line.order_id.id if po_line.order_id else None
                 po_line_json['order_name'] = po_line.order_id.name if po_line.order_id else None
                 po_line_json['odoo_id'] = po_line.id
-                po_line_json['write_date'] = format_date_obj(po_line.write_date)
+                po_line_json['write_date'] = po_line.write_date
 
                 po_line_arr.append(po_line_json)
 
@@ -250,18 +234,15 @@ class nfcappPurchaseNewApi(http.Controller):
             if not nfcapp_check_access:
                 return False
 
-            if params.get("odoo_id"):
-                odoo_id = int(params.get("odoo_id"))
-                data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().browse(odoo_id)
-            else:
-                data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().search([], order="id asc")
-
             nfcapp_farmer_arr = []
+            data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().search([], order="id asc")
             for farmer in data_nfcapp_farmer :
                 nfcapp_farmer_json = {}
                 nfcapp_farmer_json['id'] = farmer.id
                 nfcapp_farmer_json['parent_id'] = farmer.parent_id.id if farmer.parent_id else None
                 nfcapp_farmer_json['parent_name'] = farmer.parent_id.name if farmer.parent_id else None
+                nfcapp_farmer_json['station_id'] = farmer.parent_id.station_id.id if farmer.parent_id.station_id else None
+                nfcapp_farmer_json['station_name'] = farmer.parent_id.station_id.name if farmer.parent_id.station_id else None
                 nfcapp_farmer_json['code'] = farmer.code
                 nfcapp_farmer_json['farmer_name'] = farmer.farmer_name
                 nfcapp_farmer_json['farmer_role'] = farmer.farmer_role
@@ -274,10 +255,12 @@ class nfcappPurchaseNewApi(http.Controller):
                 nfcapp_farmer_json['no_ktp'] = farmer.no_ktp
                 nfcapp_farmer_json['bank_akun'] = farmer.bank_akun
                 nfcapp_farmer_json['certification_status_id'] = farmer.certification_status_id.id
+                nfcapp_farmer_json['certification_status_name'] = farmer.certification_status_id.name
                 nfcapp_farmer_json['bank_holder'] = farmer.bank_holder
                 nfcapp_farmer_json['bank_name_name'] = farmer.bank_name_id.name if farmer.bank_name_id else None
                 nfcapp_farmer_json['odoo_id'] = farmer.id
-                nfcapp_farmer_json['write_date'] = format_date_obj(farmer.write_date)
+                nfcapp_farmer_json['write_date'] = farmer.write_date
+
                 commodity_arr = []
                 data_commodity = request.env['nfcapp.commodityitem'].sudo().search([('certStatus','in',farmer.certification_status_id.id)])
                 for commodity in data_commodity:
@@ -285,16 +268,20 @@ class nfcappPurchaseNewApi(http.Controller):
                     commodity_json['farmer_id'] = farmer.id
                     commodity_json['id'] = commodity.id
                     commodity_json['code'] = commodity.code
+                    commodity_json['desc'] = commodity.desc
                     commodity_json['price'] = commodity.price
                     commodity_json['commodity_id'] = commodity.commodity_id.id if commodity.commodity_id else None
                     commodity_json['commodity_name'] = commodity.commodity_id.name if commodity.commodity_id else None
                     commodity_json['variant'] = commodity.variant
                     commodity_json['packing'] = commodity.packing
                     commodity_json['product_id'] = commodity.product_id.id if commodity.product_id else None
+                    commodity_json['product_id_code'] = commodity.product_id.itemcode if commodity.product_id else None
+                    commodity_json['product_id_name'] = commodity.product_id.name if commodity.product_id else None
                     commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
                     commodity_json['odoo_id'] = commodity.id
                     commodity_json['certStatus'] = str(commodity.certStatus.ids)
-                    commodity_json['write_date'] = format_date_obj(commodity.write_date)
+                    commodity_json['write_date'] = commodity.write_date
+                    # print(commodity_x/json)
 
                     commodity_arr.append(commodity_json)
 
@@ -336,11 +323,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 res_user_json['employee_id'] = user.employee_id.id if user.employee_id else None
                 res_user_json['employee_name'] = user.employee_id.name if user.employee_id else None
                 res_user_json['odoo_id'] = user.id
-                res_user_json['write_date'] = format_date_obj(user.write_date)
+                res_user_json['write_date'] = user.write_date
 
                 res_user_arr.append(res_user_json)
 
-            result = json.dumps(res_user_arr)
+            result = json.dumps(res_user_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e :
@@ -364,11 +351,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 commodity_json['station_id'] = commodity.station_id.id if commodity.station_id else None
                 commodity_json['station_name'] = commodity.station_id.name if commodity.station_id else None
                 commodity_json['odoo_id'] = commodity.id
-                commodity_json['write_date'] = format_date_obj(commodity.write_date)
+                commodity_json['write_date'] = commodity.write_date
 
                 commodity_arr.append(commodity_json)
 
-            result = json.dumps(commodity_arr)
+            result = json.dumps(commodity_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -397,11 +384,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 commodity_json['product_id'] = commodity.product_id.id if commodity.product_id else None
                 commodity_json['product_name'] = commodity.product_id.name if commodity.product_id else None
                 commodity_json['odoo_id'] = commodity.id
-                commodity_json['write_date'] = format_date_obj(commodity.write_date)
+                commodity_json['write_date'] = commodity.write_date
 
                 commodity_arr.append(commodity_json)
 
-            result = json.dumps(commodity_arr)
+            result = json.dumps(commodity_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -427,11 +414,11 @@ class nfcappPurchaseNewApi(http.Controller):
                 station_json['gps_longitude'] = station.gps_longitude
                 station_json['is_testing'] = station.is_testing
                 station_json['odoo_id'] = station.id
-                station_json['write_date'] = format_date_obj(station.write_date)
+                station_json['write_date'] = station.write_date
 
                 station_arr.append(station_json)
 
-            result = json.dumps(station_arr)
+            result = json.dumps(station_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -457,10 +444,10 @@ class nfcappPurchaseNewApi(http.Controller):
                 cluster_json['coordinator'] = cluster.coordinator
                 cluster_json['code'] = cluster.code
                 cluster_json['odoo_id'] = cluster.id
-                cluster_json['write_date'] = format_date_obj(cluster.write_date)
+                cluster_json['write_date'] = cluster.write_date
                 cluster_arr.append(cluster_json)
 
-            result = json.dumps(cluster_arr)
+            result = json.dumps(cluster_arr, default=str, indent=4, sort_keys=True)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e:
@@ -502,29 +489,3 @@ class nfcappPurchaseNewApi(http.Controller):
             print(e)
             return e
 
-
-    @http.route('/nfcapp-purchase/check-write-date', csrf=False, cors="*", type='http', auth="none")
-    def check_write_date(self, **params):
-        token = params.get("token")
-        odoo_user_id = params.get("odoo_user_id")
-        nfcapp_check_access = self._check_nfcap_user_authentication(token)
-        if not nfcapp_check_access:
-            return Response("Unauthorized", status=401)
-
-        model_name = params.get("model")
-        odoo_id = int(params.get("odoo_id"))
-        odoo_model_name = MAPPED_FLASK_ODOO_MODEL.get(model_name)
-        odoo_model = request.env[odoo_model_name].sudo().browse(odoo_id)
-
-        if not odoo_model.exists():
-            return NotFound("Record not found!.")
-
-        check_date = format_str_to_date(params.get('write_date'))
-        write_date_odoo = odoo_model.write_date if odoo_model.write_date else None
-        if check_date != write_date_odoo:
-            result = {"update": True, "status": 200}
-        else:
-            result = {"update": False, "status": 200}
-
-        response = Response(json.dumps(result), content_type='application/json;charset=utf-8', status=200)
-        return response
