@@ -172,7 +172,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 po_json['user_name'] = po.user_id.name if po.user_id else None
                 po_json['payment_term_name'] = po.payment_term_id.name if po.payment_term_id else None
                 po_json['odoo_id'] = po.id
-                po_json['write_date'] = format_date_obj(po.write_date)
+                po_json['write_date'] = po.write_date
                 po_arr.append(po_json)
 
             result = json.dumps(po_arr, default=str, indent=4, sort_keys=True)
