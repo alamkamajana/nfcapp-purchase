@@ -20,9 +20,6 @@ class nfcappPurchaseNewApi(http.Controller):
         except :
             return False
 
-
-
-
     @http.route('/api/purchase/login', methods=['POST', 'OPTIONS'], type='json', cors="*", auth="none", csrf=False)
     def nfcapp_api_purchase_login(self, **params):
         try:
@@ -151,7 +148,8 @@ class nfcappPurchaseNewApi(http.Controller):
                 ('res_model', '=', 'purchase.order'),
                 ('partner_id', '=', odoo_user.partner_id.id)
             ])
-            purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
+            # purchase_orders2 = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
+            purchase_orders = request.env['purchase.order'].sudo().search([('id','in',followers.mapped('res_id')),('incoterm_id','=',18)])
             po_arr = []
             for po in purchase_orders :
                 po_json = {}
@@ -236,7 +234,9 @@ class nfcappPurchaseNewApi(http.Controller):
                 return False
 
             nfcapp_farmer_arr = []
+
             data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().search([], order="id asc")
+
             for farmer in data_nfcapp_farmer :
                 nfcapp_farmer_json = {}
                 nfcapp_farmer_json['id'] = farmer.id
@@ -282,7 +282,46 @@ class nfcappPurchaseNewApi(http.Controller):
                     commodity_json['odoo_id'] = commodity.id
                     commodity_json['certStatus'] = str(commodity.certStatus.ids)
                     commodity_json['write_date'] = commodity.write_date
-                    # print(commodity_x/json)
+
+                    cert_ids = commodity.certStatus.mapped('certification_id')
+
+                    total_premium=0
+                    cu_number =""
+                    for cert_id in cert_ids:
+                        total_premium = total_premium+cert_id.premium_purchase
+                        if cert_id.no:
+                            cu_number = cu_number+", "+cert_id.no
+
+
+                    commodity_json['total_premium'] = total_premium
+                    commodity_json['cu_number'] = cu_number
+
+
+
+                    if True in commodity.certStatus.mapped('is_organic'):
+                        is_organic = True
+                    else:
+                        is_organic = False
+
+
+                    if True in commodity.certStatus.mapped('is_ra_cert'):
+                        is_ra_cert = True
+                    else:
+                        is_ra_cert = False
+
+
+
+
+                    commodity_json['is_organic'] = is_organic
+                    commodity_json['is_ra_cert'] = is_ra_cert
+
+                    commodity_json['color_hex'] = commodity.color_hex
+                    commodity_json['color_name'] = commodity.color_name
+
+
+
+
+
 
                     commodity_arr.append(commodity_json)
 

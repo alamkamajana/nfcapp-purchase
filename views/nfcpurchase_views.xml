@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="nfcpurchase_purchase_event_tree_view" model="ir.ui.view">
+        <field name="name">nfcpurchase_purchase_event.tree.view</field>
+        <field name="model">nfcpurchase.purchase.event</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Event">
+                <field name="uniq_id"/>
+                <field name="change_id"/>
+                <field name="name"/>
+                <field name="fund"/>
+                <field name="ics"/>
+                <field name="purchaser_id"/>
+                <field name="cashier_id"/>
+                <field name="ap_name"/>
+                <field name="ip_address"/>
+                <field name="purchase_order_odoo_id"/>
+                <field name="note"/>
+                <field name="date_stamp"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_nfcpurchase_purchase_event">
+        <field name="name">Purchase Event</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">nfcpurchase.purchase.event</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="NfcPurchase" id="menu_nfcpurchase" parent="" action="action_nfcpurchase_purchase_event"
+              sequence="60"/>
+
+    <menuitem name="NfcPurchase" id="menu_child_nfcpurchase" parent="menu_nfcpurchase" action=""
+              sequence="60"/>
+
+</odoo>

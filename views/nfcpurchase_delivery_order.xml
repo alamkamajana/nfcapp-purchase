@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="nfcpurchase_delivery_order_tree_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.delivery.order.tree.view</field>
+        <field name="model">nfcpurchase.delivery.order</field>
+        <field name="arch" type="xml">
+            <tree string="Delivery Order">
+                <field name="uniq_id"/>
+                <field name="change_id"/>
+                <field name="name"/>
+                <field name="driver"/>
+                <field name="vehicle_number"/>
+                <field name="purchase_event_id"/>
+                <field name="date"/>
+                <field name="destination"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_nfcpurchase_delivery_order">
+        <field name="name">Delivery Order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">nfcpurchase.delivery.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Delivery Order" id="menu_nfcpurchase_delivery_order" parent="menu_child_nfcpurchase"
+              action="action_nfcpurchase_delivery_order"
+              sequence="60"/>
+
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="nfcpurchase_purchase_order_tree_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.purchase.order.tree.view</field>
+        <field name="model">nfcpurchase.purchase.order</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Order">
+                <field name="uniq_id" string="Unique ID"/>
+                <field name="change_id" string="Change ID"/>
+                <field name="name"/>
+                <field name="receipt_number"/>
+                <field name="farmer_id"/>
+                <field name="payment_id"/>
+                <field name="status"/>
+                <field name="purchase_event_id"/>
+                <field name="is_paid"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_nfcpurchase_purchase_order">
+        <field name="name">Purchase Order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">nfcpurchase.purchase.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Purchase Order" id="menu_nfcpurchase_purchase_order" parent="menu_child_nfcpurchase"
+              action="action_nfcpurchase_purchase_order"
+              sequence="60"/>
+
+</odoo>
