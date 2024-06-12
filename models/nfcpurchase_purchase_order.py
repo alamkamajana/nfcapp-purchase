@@ -11,6 +11,7 @@ class PurchaseOrder(models.Model):
     name = fields.Char(string="Name")
     receipt_number = fields.Char(string="Receipt Number")
     farmer_id = fields.Integer()
+    farmer_odoo_true_id = fields.Many2one("nfcapp.farmer")
     payment_id = fields.Integer(string="Payment")
     status = fields.Char(string="Status")
     purchase_event_id = fields.Integer(string="Purchase Event ID")

@@ -9,6 +9,7 @@ class PurchaseOrderLine(models.Model):
     change_id = fields.Char(string='Change ID', index=True)
 
     product_odoo_id = fields.Integer(string="Product Odoo")
+    product_odoo_true_id = fields.Many2one("product.product")
     nfcapp_commodity_item_odoo_id = fields.Integer()
     qty = fields.Float(string="Quantity")
     unit_price = fields.Float(string="Unit Price")
