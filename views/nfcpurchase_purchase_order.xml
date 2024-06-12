@@ -10,6 +10,7 @@
                 <field name="name"/>
                 <field name="receipt_number"/>
                 <field name="farmer_id"/>
+                <field name="farmer_odoo_true_id"/>
                 <field name="payment_id"/>
                 <field name="status"/>
                 <field name="purchase_event_id"/>
@@ -31,6 +32,7 @@
                         <field name="name"/>
                         <field name="receipt_number"/>
                         <field name="farmer_id"/>
+                        <field name="farmer_odoo_true_id"/>
                         <field name="payment_id"/>
                         <field name="status"/>
                         <field name="purchase_event_id"/>
