@@ -16,5 +16,6 @@ class PurchaseEvent(models.Model):
     ap_name = fields.Char(string='AP Name')
     ip_address = fields.Char(string='IP Address')
     purchase_order_odoo_id = fields.Integer(string='Purchase Order')
+    purchase_order_odoo_true_id = fields.Many2one("purchase.order")
     note = fields.Text(string="Note")
     date_stamp = fields.Date(string='Date Stamp')

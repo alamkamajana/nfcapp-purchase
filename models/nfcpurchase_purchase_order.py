@@ -10,10 +10,11 @@ class PurchaseOrder(models.Model):
 
     name = fields.Char(string="Name")
     receipt_number = fields.Char(string="Receipt Number")
-    farmer_id = fields.Integer(string="Farmer")
+    farmer_id = fields.Integer()
     payment_id = fields.Integer(string="Payment")
     status = fields.Char(string="Status")
     purchase_event_id = fields.Integer(string="Purchase Event ID")
+    purchase_event_uniq_id = fields.Char()
     is_paid = fields.Boolean(string="Paid")
     signature = fields.Binary(string="Signature")
     filename = fields.Char(default="image.png")

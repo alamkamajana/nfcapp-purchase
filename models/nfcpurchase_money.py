@@ -13,3 +13,5 @@ class Money(models.Model):
     purchase_order_id = fields.Integer(string="Purchase Order")
     amount = fields.Float(string="Amount")
     note = fields.Text(string="Note")
+    purchase_event_uniq_id = fields.Char()
+    purchase_order_uniq_id = fields.Char()

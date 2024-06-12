@@ -13,3 +13,4 @@ class Payment(models.Model):
     credit = fields.Float(string="Credit")
     note = fields.Char(string="Note")
     purchase_event_id = fields.Integer(string="Purchase Event")
+    purchase_event_uniq_id = fields.Char()

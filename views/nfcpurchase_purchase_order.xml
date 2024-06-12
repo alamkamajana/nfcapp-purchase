@@ -34,6 +34,7 @@
                         <field name="payment_id"/>
                         <field name="status"/>
                         <field name="purchase_event_id"/>
+                        <field name="purchase_event_uniq_id"/>
                         <field name="is_paid"/>
                         <field name="filename"/>
                         <field name="signature" filename="filename"/>

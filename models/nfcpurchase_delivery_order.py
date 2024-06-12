@@ -18,3 +18,4 @@ class DeliveryOrder(models.Model):
     destination = fields.Char(string="Destination")
     note = fields.Text(string="Note")
     status = fields.Char()
+    purchase_event_uniq_id = fields.Char()

@@ -24,3 +24,5 @@ class PurchaseOrderLine(models.Model):
     delivery_order_id = fields.Integer(string="Delivery Order")
     purchase_order_id = fields.Integer(string="Purchase Order")
     note = fields.Text(string="Note")
+    delivery_order_uniq_id = fields.Char()
+    purchase_order_uniq_id = fields.Char()
