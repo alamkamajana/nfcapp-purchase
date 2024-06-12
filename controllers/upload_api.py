@@ -34,53 +34,18 @@ class nfcappPurchaseNewUploadApi(http.Controller):
         except:
             return False
 
-    # @http.route("/nfcpurchase/upload/", methods=["POST"], cors="*", auth="public", csrf=False, type="json")
-    # def nfcpurchase_upload(self, **params):
-    #     json_data = request.jsonrequest
-    #     token = json_data["token"]
-    #     nfcapp_check_access = self._check_nfcapp_user_authentication(token)
-    #     if not nfcapp_check_access:
-    #         return False
-    #
-    #     purchase_event_data = json_data["purchase_event"]
-    #     purchase_event = request.env["nfcpurchase.purchase.event"]
-    #
-    #     excluded_fields = ["id", "created", "modified", "create_uid", "write_uid"]
-    #     valid_fields = set(purchase_event.fields_get().keys())
-    #     filtered_purchase_event_data = [{
-    #         key: value
-    #         for key, value in data.items()
-    #         if key in valid_fields and key not in excluded_fields
-    #     } for data in purchase_event_data]
-    #     print(filtered_purchase_event_data)
-    #
-    #     for data in filtered_purchase_event_data:
-    #         check_data = purchase_event.sudo().search([("uniq_id", "=", data["uniq_id"])], limit=1)
-    #         if check_data:
-    #             if data["change_id"] != check_data.change_id:
-    #                 print("asdf")
-    #                 check_data.sudo().update(data)
-    #         else:
-    #             purchase_event.sudo().create(data)
-    #
-    #     response = {
-    #         "message": "asdfasdf",
-    #         "status": 200
-    #     }
-    #     return response
-
 
     @http.route("/nfcpurchase/upload/all/get_ids/", methods=["POST"], cors="*", auth="public", csrf=False, type="json")
     def upload_all_get_ids(self, **params):
         json_data = request.jsonrequest
         token = json_data.get("token")
         if not token or not self._check_nfcapp_user_authentication(token):
-            return {"message": "Unauthorized", "status": 401}
+            return json.dumps({"message": "Unauthorized", "status": 401})
 
         model = json_data.get("model")
         odoo_model_name = MAPPED_FLASK_ODOO_MODEL.get(model)
         if not odoo_model_name:
-            return {"message": "Invalid model", "status": 400}
+            return json.dumps({"message": "Invalid model", "status": 400})
 
         odoo_model = request.env[odoo_model_name]
         uniq_ids_to_create = []

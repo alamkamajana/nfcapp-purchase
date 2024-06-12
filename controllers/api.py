@@ -20,6 +20,9 @@ class nfcappPurchaseNewApi(http.Controller):
         except :
             return False
 
+
+
+
     @http.route('/api/purchase/login', methods=['POST', 'OPTIONS'], type='json', cors="*", auth="none", csrf=False)
     def nfcapp_api_purchase_login(self, **params):
         try:
@@ -174,7 +177,6 @@ class nfcappPurchaseNewApi(http.Controller):
                 po_arr.append(po_json)
 
             result = json.dumps(po_arr, default=str, indent=4, sort_keys=True)
-            print(result)
             response = Response(result, content_type='application/json;charset=utf-8', status=200)
             return response
         except Exception as e :
@@ -195,7 +197,8 @@ class nfcappPurchaseNewApi(http.Controller):
                 ('res_model', '=', 'purchase.order'),
                 ('partner_id', '=', odoo_user.partner_id.id)
             ])
-            purchase_orders = request.env['purchase.order'].sudo().browse(followers.mapped('res_id'))
+            purchase_orders = request.env['purchase.order'].sudo().search(
+                [('id', 'in', followers.mapped('res_id')), ('incoterm_id', '=', 18)])
             po_arr = []
             for po in purchase_orders:
                 po_arr.append(po.id)
@@ -234,9 +237,7 @@ class nfcappPurchaseNewApi(http.Controller):
                 return False
 
             nfcapp_farmer_arr = []
-
             data_nfcapp_farmer = request.env['nfcapp.farmer'].sudo().search([], order="id asc")
-
             for farmer in data_nfcapp_farmer :
                 nfcapp_farmer_json = {}
                 nfcapp_farmer_json['id'] = farmer.id
@@ -288,7 +289,7 @@ class nfcappPurchaseNewApi(http.Controller):
                     total_premium=0
                     cu_number =""
                     for cert_id in cert_ids:
-                        total_premium = total_premium+cert_id.premium_purchase
+                        total_premium = cert_id.premium_purchase
                         if cert_id.no:
                             cu_number = cu_number+", "+cert_id.no
 
