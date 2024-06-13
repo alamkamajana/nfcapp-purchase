@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<odoo>
+<data>
+
+<template id="web_nfcpurchase_purchase_order" name="NfcPurchase Purchase Order View">
+	<html>
+		<head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+            <title>Purchase Order</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+            <script
+                src="https://code.jquery.com/jquery-3.7.1.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+                crossorigin="anonymous"/>
+            <style>
+                .breadcrumb-item a {
+                    text-decoration: none;
+                }
+            </style>
+        </head>
+        <body>
+            <t t-set="farmer" t-value="purchase_order.farmer_odoo_true_id"/>
+            <t t-set="po" t-value="purchase_order"/>
+
+            <div class="container mt-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a t-attf-href="/nfcpurchase/view/purchase-event/{{purchase_event.purchase_order_odoo_true_id.id}}">
+                                <t t-esc="purchase_event.purchase_order_odoo_true_id.name"/>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item" t-if="not cashier">
+                            <a t-attf-href="/nfcpurchase/view/purchase-event/{{purchase_event.purchase_order_odoo_true_id.id}}?pe_id={{purchase_event.id}}">
+                                <span t-esc="purchase_event.name"/>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page"><t t-esc="purchase_order.name"/></li>
+                    </ol>
+                </nav>
+
+                <h1 class="mb-3">Purchase <span t-esc="purchase_order.name"/></h1>
+
+                <nav class="nav nav-pills nav-fill">
+                    <a class="nav-link active" aria-current="page" href="#sectionPurchase">Purchase</a>
+                    <a class="nav-link" href="#sectionOdooPO">Odoo PO Info</a>
+                    <a class="nav-link" href="#sectionFarmerDetail">Farmer Detail</a>
+                    <a class="nav-link" href="#sectionPayments">Payments</a>
+                </nav>
+
+                <section id="sectionPurchase" class="mt-2">
+                    <div class="row mt-4">
+                        <div class="col"/>
+                        <div class="col text-end text-uppercase fw-bold">
+                            STATUS: <t t-esc="po.status"/>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-3 d-flex align-items-center">
+                            <t t-if="farmer.photo">
+                                <img t-att-src="'data:image/png;base64,' + farmer.photo.decode('utf-8')" alt="Farmer Photo"/>
+                            </t>
+                            <t t-else="">
+                                <img src="#" alt="Farmer Photo"/>
+                            </t>
+                        </div>
+
+                        <div class="col">
+                            <table class="table table-hover align-middle">
+                                <tr>
+                                    <td style="width: 25%;">Date</td>
+                                    <td><span t-esc="po.date"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Farmer Code</td>
+                                    <td><span t-esc="farmer.code"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Farmer</td>
+                                    <td><span t-esc="farmer.farmer_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Purchase Event</td>
+                                    <td><span t-esc="purchase_event.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Odoo PO#</td>
+                                    <td><span t-esc="po_odoo.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Order</td>
+                                    <td><span t-esc="po.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Certification Status</td>
+                                    <td><span t-esc="farmer.certification_status_id.name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover align-middle" style="width: 100%; margin-top: 32px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 12%;">
+                                    Product
+                                </th>
+                                <th class="text-end" style="width: 12%;">
+                                    Price Unit
+                                </th>
+                                <th class="text-end" style="width: 8%;">
+                                    Qty
+                                </th>
+                                <th class="text-end" style="width: 16%;">
+                                    Subtotal
+                                </th>
+                                <th>
+                                    QR Code
+                                </th>
+                                <th>
+                                    Note
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        <t t-set="total_price" t-value="0"/>
+                        <t t-foreach="purchase_order_lines" t-as="line">
+                            <tr>
+                                <td>
+                                    <span><t t-esc="line.commodity_name"/> <t t-esc="line.variant"/></span>
+                                    <span><t t-esc="line.product_odoo_true_id.default_code"/></span>
+                                </td>
+                                <td class="text-end">
+                                    <span><t t-esc="'Rp {:,.2f}'.format(line.unit_price)" t-if="line.unit_price"/></span>
+                                </td>
+                                <td class="text-end">
+                                    <span><t t-esc="'{:,.2f}'.format(line.qty)" t-if="line.qty"/></span>
+                                </td>
+                                <td class="text-end">
+                                    <span><t t-esc="'Rp {:,.2f}'.format(line.subtotal)" t-if="line.subtotal"/></span>
+                                    <t t-set="total_price" t-value="total_price + line.subtotal"/>
+                                </td>
+                                <td>
+                                    <span><t t-esc="line.barcode"/></span>
+                                </td>
+                                <td>
+                                    <span><t t-esc="line.note"/></span>
+                                </td>
+                            </tr>
+                        </t>
+                        </tbody>
+
+                        <tfoot>
+                        <tr class="total-price-container">
+                            <td colspan="3">
+                                <b>Grand Total</b>
+                            </td>
+                            <td class="text-end">
+                                <span id="total-price" class="text-end">
+                                    Rp <t t-esc="'{:,.2f}'.format(total_price)"/>
+                                </span>
+                            </td>
+                            <td/>
+                            <td/>
+                        </tr>
+                        </tfoot>
+                    </table>
+                    <br/>
+
+                    <t t-if="purchase_order.signature">
+                        <img t-att-src="'data:image/png;base64,' + purchase_order.signature.decode('utf-8')" alt="Signature"/>
+                    </t>
+                    <t t-else="">
+                        <img src="#" alt="Signature"/>
+                    </t>
+                </section>
+
+                <section id="sectionOdooPO" class="mt-2" style="display: none;">
+                    <div class="row mt-4">
+                        <div class="col-3">
+                            <div>Odoo PO#</div>
+                            <div><b><t t-esc="po_odoo.name"/></b></div>
+                        </div>
+                        <div class="col-3">
+                            <div>Vendor</div>
+                            <div><b><t t-esc="po_odoo.partner_id.display_name"/></b></div>
+                        </div>
+                        <div class="col-3">
+                            <div>Ref</div>
+                            <div><b><t t-esc="po_odoo.partner_ref"/></b></div>
+                        </div>
+                        <div class="col-3">
+                            <div>Fund</div>
+                            <div><b><t t-esc="{{'{:,.2f}'.format(purchase_event.fund)}}" t-if="purchase_event.fund"/></b></div>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover align-middle mt-4">
+                        <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                        </thead>
+
+                        <t t-if="po_odoo.order_line">
+                            <tbody>
+                            <t t-set="grand_total" t-value="0"/>
+                            <t t-foreach="po_odoo.order_line" t-as="line">
+                                <tr>
+                                    <td t-esc="line.name"/>
+                                    <td class="text-end" t-esc="'{:,.2f}'.format(line.product_qty)"/>
+                                    <td class="text-end" t-esc="'Rp {:,.2f}'.format(line.price_unit)"/>
+                                    <td class="text-end" t-esc="'Rp {:,.2f}'.format(line.price_unit * line.product_qty)"/>
+                                </tr>
+
+                                <t t-set="grand_total" t-value="grand_total + (line.price_unit * line.product_qty)"/>
+                            </t>
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th colspan="3">Grand Total</th>
+                                <td class="text-end" t-esc="'Rp {:,.2f}'.format(grand_total)"/>
+                            </tr>
+                            </tfoot>
+                        </t>
+                        <t t-else="">
+                            <tr>
+                                <td colspan="4" class="text-center">N/A</td>
+                            </tr>
+                        </t>
+                    </table>
+                </section>
+
+                <section id="sectionFarmerDetail" class="mt-2" style="display: none;">
+                    <div class="row mt-4">
+                        <div class="col-3 d-flex align-items-center">
+                            <t t-if="farmer.photo">
+                                <img t-att-src="'data:image/png;base64,' + farmer.photo.decode('utf-8')" alt="Farmer Photo"/>
+                            </t>
+                            <t t-else="">
+                                <img src="#" alt="Farmer Photo"/>
+                            </t>
+                        </div>
+
+                        <div class="col">
+                            <table class="table table-hover align-middle">
+                                <tr>
+                                    <td style="width: 25%;">Farmer Code</td>
+                                    <td><span t-esc="farmer.code"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Farmer Name</td>
+                                    <td><span t-esc="farmer.farmer_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Farmer Group</td>
+                                    <td><span t-esc="farmer.parent_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Station</td>
+                                    <td><span t-esc="farmer.parent_id.station_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Certification Status</td>
+                                    <td><span t-esc="farmer.certification_status_id.name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sectionPayments">
+                    <table class="table table-hover align-middle mt-4">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Name</th>
+                                <th>Kind</th>
+                                <th>Source</th>
+                                <th class="text-end">Amount</th>
+                                <th>Type</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <t t-set="idx" t-value="1"/>
+                            <t t-foreach="money_entries" t-as="money">
+                                <tr>
+                                    <td class="text-center"><span t-esc="idx"/></td>
+                                    <td><span t-esc="money.number"/></td>
+                                    <td>
+                                        <t t-if="money.purchase_order_id">Purchase</t>
+                                        <t t-else="">Cash</t>
+                                    </td>
+                                    <td><span t-esc="po.name"/></td>
+                                    <td class="text-end"><span t-esc="'Rp {:,.2f}'.format(money.amount)"/></td>
+                                    <td>
+                                        <t t-if="money.amount &lt; 0">Credit</t>
+                                        <t t-else="">Debit</t>
+                                    </td>
+                                    <td><span t-esc="money.note"/></td>
+                                </tr>
+                                <t t-set="idx" t-value="idx + 1"/>
+                            </t>
+                        </tbody>
+                    </table>
+                </section>
+
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"/>
+            <script>
+                $(document).ready(function() {
+                    $('.nav-link').on('click', function(e) {
+                        e.preventDefault();
+                        $('.nav-link').removeClass('active');
+                        $('section').hide();
+                        $(this).addClass('active');
+                        var target = $(this).attr('href');
+                        $(target).show();
+                    });
+                });
+            </script>
+        </body>
+    </html>
+</template>
+
+</data>
+</odoo>
