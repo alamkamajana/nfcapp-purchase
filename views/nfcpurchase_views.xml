@@ -28,6 +28,13 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_purchase_event" type="object" class="oe_stat_button text-center">
+                            <span class="fa fa-external-link"/>
+                            <span class="o_stat_text">View PE</span>
+                        </button>
+                    </div>
+
                     <group>
                         <field name="uniq_id"/>
                         <field name="change_id"/>
