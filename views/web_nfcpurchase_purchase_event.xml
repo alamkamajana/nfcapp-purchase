@@ -198,7 +198,7 @@
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <t t-set="money_entries" t-as="get_money_entries(pe.uniq_id)"/>
+                                                            <t t-set="money_entries" t-value="get_money_entries(pe.uniq_id)"/>
 
                                                             <table class="table table-hover align-middle mt-4">
                                                                 <thead>
@@ -216,6 +216,7 @@
                                                                 <tbody>
                                                                     <t t-set="idx" t-value="1"/>
                                                                     <t t-foreach="money_entries" t-as="money">
+                                                                        <t t-set="money_purchase_order" t-value="get_purchase_order(money.purchase_order_uniq_id)"/>
                                                                         <tr>
                                                                             <td class="text-center"><span t-esc="idx"/></td>
                                                                             <td><span t-esc="money.number"/></td>
@@ -223,7 +224,7 @@
                                                                                 <t t-if="money.purchase_order_id">Purchase</t>
                                                                                 <t t-else="">Cash</t>
                                                                             </td>
-                                                                            <td><span t-esc="po.name"/></td>
+                                                                            <td><span t-esc="money_purchase_order.name"/></td>
                                                                             <td class="text-end"><span t-esc="'Rp {:,.2f}'.format(money.amount)"/></td>
                                                                             <td>
                                                                                 <t t-if="money.amount &lt; 0">Credit</t>
@@ -232,6 +233,11 @@
                                                                             <td><span t-esc="money.note"/></td>
                                                                         </tr>
                                                                         <t t-set="idx" t-value="idx + 1"/>
+                                                                    </t>
+                                                                    <t t-if="idx == 1">
+                                                                        <tr>
+                                                                            <td colspan="7" class="text-center">N/A</td>
+                                                                        </tr>
                                                                     </t>
                                                                 </tbody>
                                                             </table>
