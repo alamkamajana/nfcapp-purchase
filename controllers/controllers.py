@@ -15,6 +15,21 @@ class Controller(http.Controller):
         grand_total = sum(line.subtotal for line in po_lines)
         return grand_total
 
+
+    def get_purchase_orders(self, pe_uniq_id):
+        purchase_orders = request.env["nfcpurchase.purchase.order"].search([
+            ("purchase_event_uniq_id", "=", pe_uniq_id)
+        ])
+        return purchase_orders
+
+
+    def get_purchase_order(self, po_uniq_id):
+        purchase_order = request.env["nfcpurchase.purchase.order"].search([
+            ("uniq_id", "=", po_uniq_id)
+        ], limit=1)
+        return purchase_order
+
+
     @http.route("/nfcpurchase/view/purchase-event/<int:po_id>", auth="user", type="http", website=True)
     def view_purchase_event(self, po_id, **kw):
         if kw.get("pe_id"):
@@ -39,7 +54,6 @@ class Controller(http.Controller):
         po_odoo = request.env["purchase.order"].browse(po_id)
 
         def get_money_entries(pe_uniq_id):
-            print("asdf")
             money_entries = request.env["nfcpurchase.money"].search([
                 ("purchase_event_uniq_id", "=", pe_uniq_id)
             ])
@@ -60,21 +74,16 @@ class Controller(http.Controller):
             total_fund = sum(money.amount for money in money_entries)
             return total_fund
 
-        def get_purchase_orders(pe_uniq_id):
-            purchase_orders = request.env["nfcpurchase.purchase.order"].search([
-                ("purchase_event_uniq_id", "=", pe_uniq_id)
-            ])
-            return purchase_orders
-
         return_values = {
             "purchase_events": purchase_events,
             "po_odoo": po_odoo,
             "compute_money_in": compute_money_in,
             "compute_money_out": compute_money_out,
             "compute_balance": compute_balance,
-            "get_purchase_orders": get_purchase_orders,
+            "get_purchase_orders": self.get_purchase_orders,
             "compute_grand_total": self.compute_grand_total,
             "get_money_entries": get_money_entries,
+            "get_purchase_order": self.get_purchase_order,
         }
         return request.render("nfcapp-purchase.web_nfcpurchase_purchase_event", return_values)
 
@@ -123,17 +132,11 @@ class Controller(http.Controller):
             ])
             return order_lines
 
-        def get_purchase_order(po_uniq_id):
-            purchase_order = request.env["nfcpurchase.purchase.order"].search([
-                ("uniq_id", "=", po_uniq_id)
-            ], limit=1)
-            return purchase_order
-
         return_values = {
             "purchase_event": purchase_event,
             "delivery_orders": delivery_orders,
             "get_order_lines": get_order_lines,
-            "get_purchase_order": get_purchase_order,
+            "get_purchase_order": self.get_purchase_order,
         }
 
         return request.render("nfcapp-purchase.web_nfcpurchase_delivery_order", return_values)
