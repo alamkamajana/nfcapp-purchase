@@ -15,7 +15,7 @@
     "version": "1",
 
     # any module necessary for this one to work correctly
-    "depends": ["base", "hr","nfcapp"],
+    "depends": ["base", "hr", "nfcapp", "purchase"],
 
     # always loaded
     "data": [
@@ -26,6 +26,9 @@
         "views/nfcpurchase_payment.xml",
         "views/nfcpurchase_delivery_order.xml",
         "views/nfcpurchase_money.xml",
+        "views/web_nfcpurchase_purchase_event.xml",
+        "views/web_nfcpurchase_purchase_order.xml",
+        "views/web_nfcpurchase_delivery_order.xml",
     ],
 
 }
