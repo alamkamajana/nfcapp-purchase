@@ -19,3 +19,13 @@ class PurchaseEvent(models.Model):
     purchase_order_odoo_true_id = fields.Many2one("purchase.order")
     note = fields.Text(string="Note")
     date_stamp = fields.Date(string='Date Stamp')
+
+    def open_purchase_event(self):
+        po_odoo_id = self.purchase_order_odoo_true_id.id
+        pe_id = self.id
+        link = f"/nfcpurchase/view/purchase-event/{po_odoo_id}?pe_id={pe_id}"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': link,
+            'target': 'new',
+        }
