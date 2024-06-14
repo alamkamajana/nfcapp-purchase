@@ -136,13 +136,13 @@
                                     <span><t t-esc="line.product_odoo_true_id.default_code"/></span>
                                 </td>
                                 <td class="text-end">
-                                    <span><t t-esc="'Rp {:,.2f}'.format(line.unit_price)" t-if="line.unit_price"/></span>
+                                    Rp <span t-esc="line.unit_price" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td class="text-end">
-                                    <span><t t-esc="'{:,.2f}'.format(line.qty)" t-if="line.qty"/></span>
+                                    <span t-esc="line.qty" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td class="text-end">
-                                    <span><t t-esc="'Rp {:,.2f}'.format(line.subtotal)" t-if="line.subtotal"/></span>
+                                    Rp <span t-esc="line.subtotal" t-options="{'widget': 'float', 'precision': 2}"/>
                                     <t t-set="total_price" t-value="total_price + line.subtotal"/>
                                 </td>
                                 <td>
@@ -161,9 +161,7 @@
                                 <b>Grand Total</b>
                             </td>
                             <td class="text-end">
-                                <span id="total-price" class="text-end">
-                                    Rp <t t-esc="'{:,.2f}'.format(total_price)"/>
-                                </span>
+                                Rp <span t-esc="total_price" t-options="{'widget': 'float', 'precision': 2}"/>
                             </td>
                             <td/>
                             <td/>
@@ -196,7 +194,7 @@
                         </div>
                         <div class="col-3">
                             <div>Fund</div>
-                            <div><b><t t-esc="{{'{:,.2f}'.format(purchase_event.fund)}}" t-if="purchase_event.fund"/></b></div>
+                            <div><b><t t-esc="purchase_event.fund" t-options="{'widget': 'float', 'precision': 2}"/></b></div>
                         </div>
                     </div>
 
@@ -216,9 +214,9 @@
                             <t t-foreach="po_odoo.order_line" t-as="line">
                                 <tr>
                                     <td t-esc="line.name"/>
-                                    <td class="text-end" t-esc="'{:,.2f}'.format(line.product_qty)"/>
-                                    <td class="text-end" t-esc="'Rp {:,.2f}'.format(line.price_unit)"/>
-                                    <td class="text-end" t-esc="'Rp {:,.2f}'.format(line.price_unit * line.product_qty)"/>
+                                    <td class="text-end"><span t-esc="line.product_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                    <td class="text-end">Rp <span t-esc="line.price_unit" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                    <td class="text-end">Rp <span t-esc="line.price_unit * line.product_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
                                 </tr>
 
                                 <t t-set="grand_total" t-value="grand_total + (line.price_unit * line.product_qty)"/>
@@ -228,7 +226,7 @@
                             <tfoot>
                             <tr>
                                 <th colspan="3">Grand Total</th>
-                                <td class="text-end" t-esc="'Rp {:,.2f}'.format(grand_total)"/>
+                                <td class="text-end"><span t-esc="grand_total" t-options="{'widget': 'float', 'precision': 2}"/></td>
                             </tr>
                             </tfoot>
                         </t>
@@ -303,7 +301,7 @@
                                         <t t-else="">Cash</t>
                                     </td>
                                     <td><span t-esc="po.name"/></td>
-                                    <td class="text-end"><span t-esc="'Rp {:,.2f}'.format(money.amount)"/></td>
+                                    <td class="text-end">Rp <span t-esc="money.amount" t-options="{'widget': 'float', 'precision': 2}"/></td>
                                     <td>
                                         <t t-if="money.amount &lt; 0">Credit</t>
                                         <t t-else="">Debit</t>
