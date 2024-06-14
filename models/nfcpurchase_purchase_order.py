@@ -22,21 +22,22 @@ class PurchaseOrder(models.Model):
     date = fields.Date(string="Date")
 
     def compute_is_paid(self):
-        money_entries = self.env["nfcpurchase.money"].search([
-            ("purchase_order_uniq_id", "=", self.uniq_id)
-        ])
-        purchase_order_lines = self.env["nfcpurchase.purchase.order.line"].search([
-            ("purchase_order_uniq_id", "=", self.uniq_id)
-        ])
+        for rec in self:
+            money_entries = rec.env["nfcpurchase.money"].search([
+                ("purchase_order_uniq_id", "=", rec.uniq_id)
+            ])
+            purchase_order_lines = rec.env["nfcpurchase.purchase.order.line"].search([
+                ("purchase_order_uniq_id", "=", rec.uniq_id)
+            ])
 
-        total_payment = sum(money.amount for money in money_entries)
-        grand_total = sum(line.subtotal for line in purchase_order_lines)
-        calculation = total_payment + grand_total
-        payment_positive = abs(total_payment)
+            total_payment = sum(money.amount for money in money_entries)
+            grand_total = sum(line.subtotal for line in purchase_order_lines)
+            calculation = total_payment + grand_total
+            payment_positive = abs(total_payment)
 
-        if payment_positive >= grand_total and int(total_payment) != 0:
-            self.is_paid = True
-        elif int(calculation) > 0:
-            self.is_paid = False
-        else:
-            self.is_paid = False
+            if payment_positive >= grand_total and int(total_payment) != 0:
+                rec.is_paid = True
+            elif int(calculation) > 0:
+                rec.is_paid = False
+            else:
+                rec.is_paid = False
