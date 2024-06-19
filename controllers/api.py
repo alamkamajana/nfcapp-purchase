@@ -294,7 +294,7 @@ class nfcappPurchaseNewApi(http.Controller):
                             cu_number = cu_number+", "+cert_id.no
 
 
-                    commodity_json['total_premium'] = total_premium
+                    commodity_json['total_premium'] = commodity.total_premium
                     commodity_json['cu_number'] = cu_number
 
 
@@ -313,7 +313,7 @@ class nfcappPurchaseNewApi(http.Controller):
 
 
 
-                    commodity_json['is_organic'] = is_organic
+                    commodity_json['is_organic'] = commodity.organic
                     commodity_json['is_ra_cert'] = is_ra_cert
 
                     commodity_json['color_hex'] = commodity.color_hex

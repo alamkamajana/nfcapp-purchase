@@ -25,6 +25,38 @@
         </field>
     </record>
 
+    <record id="nfcpurchase_purchase_order_line_form_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.purchase.order.line.form.view</field>
+        <field name="model">nfcpurchase.purchase.order.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="uniq_id"/>
+                        <field name="change_id"/>
+                        <field name="product_odoo_id"/>
+                        <field name="product_odoo_true_id"/>
+                        <field name="qty"/>
+                        <field name="unit_price"/>
+                        <field name="barcode"/>
+                        <field name="commodity_name"/>
+                        <field name="variant"/>
+                        <field name="is_organic"/>
+                        <field name="is_ra_cert"/>
+                        <field name="color_name"/>
+                        <field name="color_hex"/>
+                        <field name="subtotal"/>
+                        <field name="currency"/>
+                        <field name="delivery_order_id"/>
+                        <field name="delivery_order_uniq_id"/>
+                        <field name="purchase_order_id"/>
+                        <field name="purchase_order_uniq_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record model="ir.actions.act_window" id="action_nfcpurchase_purchase_order_line">
         <field name="name">Purchase Order Line</field>
         <field name="type">ir.actions.act_window</field>

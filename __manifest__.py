@@ -26,6 +26,9 @@
         "views/nfcpurchase_payment.xml",
         "views/nfcpurchase_delivery_order.xml",
         "views/nfcpurchase_money.xml",
+        "views/web_nfcpurchase_purchase_event.xml",
+        "views/web_nfcpurchase_purchase_order.xml",
+        "views/web_nfcpurchase_delivery_order.xml",
     ],
 
 }

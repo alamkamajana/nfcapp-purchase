@@ -22,6 +22,39 @@
         </field>
     </record>
 
+    <record id="nfcpurchase_purchase_event_form_view" model="ir.ui.view">
+        <field name="name">nfcpurchase_purchase_event.form.view</field>
+        <field name="model">nfcpurchase.purchase.event</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_purchase_event" type="object" class="oe_stat_button text-center">
+                            <span class="fa fa-external-link"/>
+                            <span class="o_stat_text">View PE</span>
+                        </button>
+                    </div>
+
+                    <group>
+                        <field name="uniq_id"/>
+                        <field name="change_id"/>
+                        <field name="name"/>
+                        <field name="fund"/>
+                        <field name="ics"/>
+                        <field name="purchaser_id"/>
+                        <field name="cashier_id"/>
+                        <field name="ap_name"/>
+                        <field name="ip_address"/>
+                        <field name="purchase_order_odoo_id"/>
+                        <field name="purchase_order_odoo_true_id"/>
+                        <field name="note"/>
+                        <field name="date_stamp"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record model="ir.actions.act_window" id="action_nfcpurchase_purchase_event">
         <field name="name">Purchase Event</field>
         <field name="type">ir.actions.act_window</field>

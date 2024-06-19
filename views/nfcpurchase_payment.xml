@@ -16,6 +16,27 @@
         </field>
     </record>
 
+    <record id="nfcpurchase_payment_form_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.payment.form.view</field>
+        <field name="model">nfcpurchase.payment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="uniq_id"/>
+                        <field name="change_id"/>
+                        <field name="purchase_order_id"/>
+                        <field name="debit"/>
+                        <field name="credit"/>
+                        <field name="note"/>
+                        <field name="purchase_event_id"/>
+                        <field name="purchase_event_uniq_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record model="ir.actions.act_window" id="action_nfcpurchase_payment">
         <field name="name">Payment</field>
         <field name="type">ir.actions.act_window</field>
