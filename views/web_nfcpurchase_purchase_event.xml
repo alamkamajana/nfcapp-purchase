@@ -5,20 +5,18 @@
 
 <template id="web_nfcpurchase_purchase_event" name="NfcPurchase Purchase Event View">
 	<html>
-		<head>
+        <head>
             <meta charset="UTF-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
             <title>Purchase Event</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-            <script
-                src="https://code.jquery.com/jquery-3.7.1.min.js"
-                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-                crossorigin="anonymous"/>
-            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'/>
+            <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+                    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"/>
+            <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
             <style>
                 section {
-                    display: none;
+                display: none;
                 }
             </style>
         </head>
@@ -27,9 +25,9 @@
                 <t t-if="purchase_events">
                     <h1>Purchase Events</h1>
 
-                    <nav class="nav nav-pills nav-fill mt-4">
+                    <nav class="nav nav-pills nav-fill mt-4" style="width: 30%;">
                         <a class="nav-link" aria-current="page" href="#sectionPurchaseEvents">Purchase Event List</a>
-                        <a class="nav-link" href="#sectionOdooPO">Odoo PO Info</a>
+<!--                        <a class="nav-link" href="#sectionOdooPO">Odoo PO Info</a>-->
                     </nav>
 
                     <section id="sectionPurchaseEvents">
@@ -39,53 +37,83 @@
                                     <th>Date</th>
                                     <th>Purchase Event</th>
                                     <th>Note</th>
-                                    <th class="text-end">Cash In</th>
+                                    <th class="text-end">Qty</th>
+                                       <th class="text-end">Subtotal</th>
                                     <th class="text-end">Cash Out</th>
+                                    <th class="text-end">Cash In</th>
                                     <th class="text-end">Cash Balance</th>
-                                    <th class="text-center">Actions</th>
-                                    <th class="text-center">Print</th>
+                                    <!--<th class="text-center">Actions</th>-->
+                                    <th class="text-center"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-foreach="purchase_events" t-as="pe">
+                                    <t t-set="qty_count" t-value="0"/>
+                                    <t t-set="subtotal_count" t-value="0"/>
+                                    <t t-set="purchase_orders" t-value="request.env['nfcpurchase.purchase.order'].search([('purchase_event_uniq_id', '=', pe.uniq_id)])"/>
+                                    <t t-foreach="purchase_orders" t-as="po">
+                                        <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/>
+                                        <t t-foreach="po_lines" t-as="po_line">
+                                            <t t-set="qty_count" t-value="qty_count+po_line.qty"/>
+                                            <t t-set="subtotal_count" t-value="subtotal_count+po_line.subtotal"/>
+                                        </t>
+                                    </t>
                                     <tr>
-                                        <td><span t-esc="pe.date_stamp"/></td>
-                                        <td><span t-esc="pe.name"/></td>
-                                        <td><span t-esc="pe.note"/></td>
-                                        <td class="text-end">Rp <span t-esc="compute_money_in(pe.uniq_id)" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td class="text-end">Rp <span t-esc="compute_money_out(pe.uniq_id)" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td class="text-end">Rp <span t-esc="compute_balance(pe.uniq_id)" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                        <td>
+                                            <span t-esc="pe.date_stamp"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="pe.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="pe.note"/>
+                                        </td>
+                                        <td  class="text-end">
+                                            <span t-esc="qty_count"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
+                                          <td  class="text-end">
+                                           Rp. <span t-esc="subtotal_count"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
+                                        <td class="text-end">Rp
+                                            <span t-esc="compute_money_in(pe.uniq_id)"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
+                                        <td class="text-end">Rp
+                                            <span t-esc="compute_money_out(pe.uniq_id)"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
+                                        <td class="text-end">Rp
+                                            <span t-esc="compute_balance(pe.uniq_id)"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
                                         <td class="text-center">
-                                            <a type="button" class="btn btn-primary btn-md text-decoration-none"
-                                               t-attf-href="/nfcpurchase/view/purchase-event/{{po_odoo.id}}?pe_id={{pe.id}}"
-                                               data-toggle="tooltip" title="Purchase"
-                                            >
-                                                <i class="bx bxs-cart"/>
-                                            </a>
-                                            <a type="button" class="btn btn-primary btn-md text-decoration-none"
-                                               t-attf-href="/nfcpurchase/view/delivery-order/{{pe.id}}"
-                                               data-toggle="tooltip" title="Delivery"
-                                            >
-                                                <i class="bx bxs-car"/>
-                                            </a>
+                                            <!--<a type="button" class="btn btn-primary btn-md text-decoration-none" t-attf-href="/nfcpurchase/view/purchase-event/{{po_odoo.id}}?pe_id={{pe.id}}" data-toggle="tooltip" title="Purchase">-->
+                                            <!--    <i class="bx bxs-cart"/>-->
+                                            <!--</a>-->
+                                            <!--<a type="button" class="btn btn-primary btn-md text-decoration-none" t-attf-href="/nfcpurchase/view/delivery-order/{{pe.id}}" data-toggle="tooltip" title="Delivery">-->
+                                            <!--    <i class="bx bxs-truck"/>-->
+                                            <!--</a>-->
 
-                                            <button type="button" class="btn btn-primary btn-md"
-                                                    data-bs-toggle="modal" t-attf-data-bs-target="#modalPayments-{{pe.id}}"
-                                                    data-toggle="tooltip" title="Payments"
-                                            >
-                                                <i class="bx bxs-credit-card"/>
-                                            </button>
+                                            <!--<button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal" t-attf-data-bs-target="#modalPayments-{{pe.id}}" data-toggle="tooltip" title="Payments">-->
+                                            <!--    <i class="bx bxs-credit-card"/>-->
+                                            <!--</button>-->
 
                                             <div class="modal modal-lg fade" t-attf-id="modalPayments-{{pe.id}}"
                                                  tabindex="-1" aria-labelledby="modalCashier" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h1 class="modal-title fs-5">Payments <span t-esc="pe.name"/></h1>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                                                            <h1 class="modal-title fs-5">Payments
+                                                                <span t-esc="pe.name"/>
+                                                            </h1>
+                                                            <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"/>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <t t-set="money_entries" t-value="get_money_entries(pe.uniq_id)"/>
+                                                            <t t-set="money_entries"
+                                                               t-value="get_money_entries(pe.uniq_id)"/>
 
                                                             <table class="table table-hover align-middle mt-4">
                                                                 <thead>
@@ -103,21 +131,35 @@
                                                                 <tbody>
                                                                     <t t-set="idx" t-value="1"/>
                                                                     <t t-foreach="money_entries" t-as="money">
-                                                                        <t t-set="money_purchase_order" t-value="get_purchase_order(money.purchase_order_uniq_id)"/>
+                                                                        <t t-set="money_purchase_order"
+                                                                           t-value="get_purchase_order(money.purchase_order_uniq_id)"/>
                                                                         <tr>
-                                                                            <td class="text-center"><span t-esc="idx"/></td>
-                                                                            <td><span t-esc="money.number"/></td>
+                                                                            <td class="text-center">
+                                                                                <span t-esc="idx"/>
+                                                                            </td>
                                                                             <td>
-                                                                                <t t-if="money.purchase_order_id">Purchase</t>
+                                                                                <span t-esc="money.number"/>
+                                                                            </td>
+                                                                            <td>
+                                                                                <t t-if="money.purchase_order_id">
+                                                                                    Purchase
+                                                                                </t>
                                                                                 <t t-else="">Cash</t>
                                                                             </td>
-                                                                            <td><span t-esc="money_purchase_order.name"/></td>
-                                                                            <td class="text-end">Rp <span t-esc="money.amount" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                                                            <td>
+                                                                                <span t-esc="money_purchase_order.name"/>
+                                                                            </td>
+                                                                            <td class="text-end">Rp
+                                                                                <span t-esc="money.amount"
+                                                                                      t-options="{'widget': 'float', 'precision': 2}"/>
+                                                                            </td>
                                                                             <td>
                                                                                 <t t-if="money.amount &lt; 0">Credit</t>
                                                                                 <t t-else="">Debit</t>
                                                                             </td>
-                                                                            <td><span t-esc="money.note"/></td>
+                                                                            <td>
+                                                                                <span t-esc="money.note"/>
+                                                                            </td>
                                                                         </tr>
                                                                         <t t-set="idx" t-value="idx + 1"/>
                                                                     </t>
@@ -130,149 +172,151 @@
                                                             </table>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Close
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-<!--                                            <button type="button" class="btn btn-primary btn-md"-->
-<!--                                                    data-bs-toggle="modal" t-attf-data-bs-target="#modalCashier-{{pe.id}}"-->
-<!--                                                    data-toggle="tooltip" title="Cashier"-->
-<!--                                            >-->
-<!--                                                <i class="bx bx-dollar"/>-->
-<!--                                            </button>-->
-<!--                                            <div class="modal modal-lg fade" t-attf-id="modalCashier-{{pe.id}}"-->
-<!--                                                 tabindex="-1" aria-labelledby="modalCashier" aria-hidden="true">-->
-<!--                                                <div class="modal-dialog">-->
-<!--                                                    <div class="modal-content">-->
-<!--                                                        <div class="modal-header">-->
-<!--                                                            <h1 class="modal-title fs-5">Cashier <span t-esc="pe.name"/></h1>-->
-<!--                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>-->
-<!--                                                        </div>-->
-<!--                                                        <div class="modal-body">-->
-<!--                                                            <t t-set="get_pos" t-value="get_purchase_orders(pe.uniq_id)"/>-->
+                                            <!--                                            <button type="button" class="btn btn-primary btn-md"-->
+                                            <!--                                                    data-bs-toggle="modal" t-attf-data-bs-target="#modalCashier-{{pe.id}}"-->
+                                            <!--                                                    data-toggle="tooltip" title="Cashier"-->
+                                            <!--                                            >-->
+                                            <!--                                                <i class="bx bx-dollar"/>-->
+                                            <!--                                            </button>-->
+                                            <!--                                            <div class="modal modal-lg fade" t-attf-id="modalCashier-{{pe.id}}"-->
+                                            <!--                                                 tabindex="-1" aria-labelledby="modalCashier" aria-hidden="true">-->
+                                            <!--                                                <div class="modal-dialog">-->
+                                            <!--                                                    <div class="modal-content">-->
+                                            <!--                                                        <div class="modal-header">-->
+                                            <!--                                                            <h1 class="modal-title fs-5">Cashier <span t-esc="pe.name"/></h1>-->
+                                            <!--                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>-->
+                                            <!--                                                        </div>-->
+                                            <!--                                                        <div class="modal-body">-->
+                                            <!--                                                            <t t-set="get_pos" t-value="get_purchase_orders(pe.uniq_id)"/>-->
 
-<!--                                                            <nav class="nav nav-pills nav-fill">-->
-<!--                                                                <a t-attf-class="cashier cashier-{{pe.id}} nav-link" aria-current="page" t-attf-href="#paid-{{pe.id}}">Paid Order</a>-->
-<!--                                                                <a t-attf-class="cashier cashier-{{pe.id}} nav-link" t-attf-href="#unpaid-{{pe.id}}">Unpaid Order</a>-->
-<!--                                                            </nav>-->
+                                            <!--                                                            <nav class="nav nav-pills nav-fill">-->
+                                            <!--                                                                <a t-attf-class="cashier cashier-{{pe.id}} nav-link" aria-current="page" t-attf-href="#paid-{{pe.id}}">Paid Order</a>-->
+                                            <!--                                                                <a t-attf-class="cashier cashier-{{pe.id}} nav-link" t-attf-href="#unpaid-{{pe.id}}">Unpaid Order</a>-->
+                                            <!--                                                            </nav>-->
 
-<!--                                                            <section t-attf-id="paid-{{pe.id}}">-->
-<!--                                                                <table class="table table-hover">-->
-<!--                                                                    <thead>-->
-<!--                                                                        <tr>-->
-<!--                                                                            <th>Order#</th>-->
-<!--                                                                            <th>Farmer Code</th>-->
-<!--                                                                            <th>Farmer</th>-->
-<!--                                                                            <th class="text-end">Total</th>-->
-<!--                                                                            <th>Status</th>-->
-<!--                                                                            <th class="text-center">Paid</th>-->
-<!--                                                                            <th class="text-center">Action</th>-->
-<!--                                                                        </tr>-->
-<!--                                                                    </thead>-->
-<!--                                                                    <tbody>-->
-<!--                                                                        <t t-set="len_paid" t-value="0"/>-->
-<!--                                                                        <t t-foreach="get_pos" t-as="po">-->
-<!--                                                                            <t t-set="farmer" t-value="po.farmer_odoo_true_id"/>-->
-<!--                                                                            <tr t-if="po.is_paid">-->
-<!--                                                                                <td><span t-esc="po.name"/></td>-->
-<!--                                                                                <td><span t-esc="farmer.code"/></td>-->
-<!--                                                                                <td><span t-esc="farmer.farmer_name"/></td>-->
-<!--                                                                                <td class="text-end">Rp <span t-esc="compute_grand_total(po)" t-options="{'widget': 'float', 'precision': 2}"/></td>-->
-<!--                                                                                <td><span t-esc="po.status"/></td>-->
-<!--                                                                                <td class="text-center"><i class="bx bx-check-square bx-sm"/></td>-->
-<!--                                                                                <td class="text-center">-->
-<!--                                                                                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
-<!--                                                                                       t-attf-href="/nfcpurchase/view/purchase-order/{{po.id}}?cashier=cashier"-->
-<!--                                                                                       data-toggle="tooltip" title="Open"-->
-<!--                                                                                    >-->
-<!--                                                                                        <i class="bx bxs-door-open"/>-->
-<!--                                                                                    </a>-->
-<!--                                                                                </td>-->
-<!--                                                                                <t t-set="len_paid" t-value="len_paid + 1"/>-->
-<!--                                                                            </tr>-->
-<!--                                                                        </t>-->
-<!--                                                                        <t t-if="len_paid == 0">-->
-<!--                                                                            <tr><td class="text-center" colspan="7">N/A</td></tr>-->
-<!--                                                                        </t>-->
-<!--                                                                    </tbody>-->
-<!--                                                                </table>-->
-<!--                                                            </section>-->
+                                            <!--                                                            <section t-attf-id="paid-{{pe.id}}">-->
+                                            <!--                                                                <table class="table table-hover">-->
+                                            <!--                                                                    <thead>-->
+                                            <!--                                                                        <tr>-->
+                                            <!--                                                                            <th>Order#</th>-->
+                                            <!--                                                                            <th>Farmer Code</th>-->
+                                            <!--                                                                            <th>Farmer</th>-->
+                                            <!--                                                                            <th class="text-end">Total</th>-->
+                                            <!--                                                                            <th>Status</th>-->
+                                            <!--                                                                            <th class="text-center">Paid</th>-->
+                                            <!--                                                                            <th class="text-center">Action</th>-->
+                                            <!--                                                                        </tr>-->
+                                            <!--                                                                    </thead>-->
+                                            <!--                                                                    <tbody>-->
+                                            <!--                                                                        <t t-set="len_paid" t-value="0"/>-->
+                                            <!--                                                                        <t t-foreach="get_pos" t-as="po">-->
+                                            <!--                                                                            <t t-set="farmer" t-value="po.farmer_odoo_true_id"/>-->
+                                            <!--                                                                            <tr t-if="po.is_paid">-->
+                                            <!--                                                                                <td><span t-esc="po.name"/></td>-->
+                                            <!--                                                                                <td><span t-esc="farmer.code"/></td>-->
+                                            <!--                                                                                <td><span t-esc="farmer.farmer_name"/></td>-->
+                                            <!--                                                                                <td class="text-end">Rp <span t-esc="compute_grand_total(po)" t-options="{'widget': 'float', 'precision': 2}"/></td>-->
+                                            <!--                                                                                <td><span t-esc="po.status"/></td>-->
+                                            <!--                                                                                <td class="text-center"><i class="bx bx-check-square bx-sm"/></td>-->
+                                            <!--                                                                                <td class="text-center">-->
+                                            <!--                                                                                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
+                                            <!--                                                                                       t-attf-href="/nfcpurchase/view/purchase-order/{{po.id}}?cashier=cashier"-->
+                                            <!--                                                                                       data-toggle="tooltip" title="Open"-->
+                                            <!--                                                                                    >-->
+                                            <!--                                                                                        <i class="bx bxs-door-open"/>-->
+                                            <!--                                                                                    </a>-->
+                                            <!--                                                                                </td>-->
+                                            <!--                                                                                <t t-set="len_paid" t-value="len_paid + 1"/>-->
+                                            <!--                                                                            </tr>-->
+                                            <!--                                                                        </t>-->
+                                            <!--                                                                        <t t-if="len_paid == 0">-->
+                                            <!--                                                                            <tr><td class="text-center" colspan="7">N/A</td></tr>-->
+                                            <!--                                                                        </t>-->
+                                            <!--                                                                    </tbody>-->
+                                            <!--                                                                </table>-->
+                                            <!--                                                            </section>-->
 
-<!--                                                            <section t-attf-id="unpaid-{{pe.id}}">-->
-<!--                                                                <table class="table table-hover">-->
-<!--                                                                    <thead>-->
-<!--                                                                        <tr>-->
-<!--                                                                            <th>Order#</th>-->
-<!--                                                                            <th>Farmer Code</th>-->
-<!--                                                                            <th>Farmer</th>-->
-<!--                                                                            <th class="text-end">Total</th>-->
-<!--                                                                            <th>Status</th>-->
-<!--                                                                            <th class="text-center">Paid</th>-->
-<!--                                                                            <th class="text-center">Action</th>-->
-<!--                                                                        </tr>-->
-<!--                                                                    </thead>-->
-<!--                                                                    <tbody>-->
-<!--                                                                        <t t-set="len_notpaid" t-value="0"/>-->
-<!--                                                                        <t t-foreach="get_pos" t-as="po">-->
-<!--                                                                            <t t-set="farmer" t-value="po.farmer_odoo_true_id"/>-->
-<!--                                                                            <tr t-if="not po.is_paid">-->
-<!--                                                                                <td><span t-esc="po.name"/></td>-->
-<!--                                                                                <td><span t-esc="farmer.code"/></td>-->
-<!--                                                                                <td><span t-esc="farmer.farmer_name"/></td>-->
-<!--                                                                                <td class="text-end">Rp <span t-esc="compute_grand_total(po)" t-options="{'widget': 'float', 'precision': 2}"/></td>-->
-<!--                                                                                <td><span t-esc="po.status"/></td>-->
-<!--                                                                                <td class="text-center"><i class="bx bx-check-square bx-sm"/></td>-->
-<!--                                                                                <td class="text-center">-->
-<!--                                                                                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
-<!--                                                                                       t-attf-href="/nfcpurchase/view/purchase-order/{{po.id}}?cashier=cashier"-->
-<!--                                                                                       data-toggle="tooltip" title="Open"-->
-<!--                                                                                    >-->
-<!--                                                                                        <i class="bx bxs-door-open"/>-->
-<!--                                                                                    </a>-->
-<!--                                                                                </td>-->
-<!--                                                                                <t t-set="len_notpaid" t-value="len_notpaid + 1"/>-->
-<!--                                                                            </tr>-->
-<!--                                                                        </t>-->
-<!--                                                                        <t t-if="len_notpaid == 0">-->
-<!--                                                                                <tr><td class="text-center" colspan="7">N/A</td></tr>-->
-<!--                                                                            </t>-->
-<!--                                                                    </tbody>-->
-<!--                                                                </table>-->
-<!--                                                            </section>-->
+                                            <!--                                                            <section t-attf-id="unpaid-{{pe.id}}">-->
+                                            <!--                                                                <table class="table table-hover">-->
+                                            <!--                                                                    <thead>-->
+                                            <!--                                                                        <tr>-->
+                                            <!--                                                                            <th>Order#</th>-->
+                                            <!--                                                                            <th>Farmer Code</th>-->
+                                            <!--                                                                            <th>Farmer</th>-->
+                                            <!--                                                                            <th class="text-end">Total</th>-->
+                                            <!--                                                                            <th>Status</th>-->
+                                            <!--                                                                            <th class="text-center">Paid</th>-->
+                                            <!--                                                                            <th class="text-center">Action</th>-->
+                                            <!--                                                                        </tr>-->
+                                            <!--                                                                    </thead>-->
+                                            <!--                                                                    <tbody>-->
+                                            <!--                                                                        <t t-set="len_notpaid" t-value="0"/>-->
+                                            <!--                                                                        <t t-foreach="get_pos" t-as="po">-->
+                                            <!--                                                                            <t t-set="farmer" t-value="po.farmer_odoo_true_id"/>-->
+                                            <!--                                                                            <tr t-if="not po.is_paid">-->
+                                            <!--                                                                                <td><span t-esc="po.name"/></td>-->
+                                            <!--                                                                                <td><span t-esc="farmer.code"/></td>-->
+                                            <!--                                                                                <td><span t-esc="farmer.farmer_name"/></td>-->
+                                            <!--                                                                                <td class="text-end">Rp <span t-esc="compute_grand_total(po)" t-options="{'widget': 'float', 'precision': 2}"/></td>-->
+                                            <!--                                                                                <td><span t-esc="po.status"/></td>-->
+                                            <!--                                                                                <td class="text-center"><i class="bx bx-check-square bx-sm"/></td>-->
+                                            <!--                                                                                <td class="text-center">-->
+                                            <!--                                                                                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
+                                            <!--                                                                                       t-attf-href="/nfcpurchase/view/purchase-order/{{po.id}}?cashier=cashier"-->
+                                            <!--                                                                                       data-toggle="tooltip" title="Open"-->
+                                            <!--                                                                                    >-->
+                                            <!--                                                                                        <i class="bx bxs-door-open"/>-->
+                                            <!--                                                                                    </a>-->
+                                            <!--                                                                                </td>-->
+                                            <!--                                                                                <t t-set="len_notpaid" t-value="len_notpaid + 1"/>-->
+                                            <!--                                                                            </tr>-->
+                                            <!--                                                                        </t>-->
+                                            <!--                                                                        <t t-if="len_notpaid == 0">-->
+                                            <!--                                                                                <tr><td class="text-center" colspan="7">N/A</td></tr>-->
+                                            <!--                                                                            </t>-->
+                                            <!--                                                                    </tbody>-->
+                                            <!--                                                                </table>-->
+                                            <!--                                                            </section>-->
 
-<!--                                                        </div>-->
-<!--                                                        <div class="modal-footer">-->
-<!--                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
-<!--                                                        </div>-->
-<!--                                                    </div>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
+                                            <!--                                                        </div>-->
+                                            <!--                                                        <div class="modal-footer">-->
+                                            <!--                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+                                            <!--                                                        </div>-->
+                                            <!--                                                    </div>-->
+                                            <!--                                                </div>-->
+                                            <!--                                            </div>-->
                                         </td>
 
                                         <td class="text-center">
                                             <a type="button" class="btn btn-primary btn-md text-decoration-none"
-                                               t-attf-href="/nfcpurchase/view/purchase-event/print/{{pe.id}}"
-                                               target="_blank"
-                                               data-toggle="tooltip" title="Print Purchase"
-                                            >
+                                               t-attf-href="/nfcpurchase/view/purchase-event/{{po_odoo.id}}?pe_id={{pe.id}}"
+                                               data-toggle="tooltip" title="Purchase">
                                                 <i class="bx bxs-cart"/>
                                             </a>
 
                                             <a type="button" class="btn btn-primary btn-md text-decoration-none"
+                                               t-attf-href="/nfcpurchase/view/purchase-event/print/{{pe.id}}"
+                                               target="_blank" data-toggle="tooltip" title="Print Order Lines">
+                                                <i class="bx bxs-printer"/>
+                                            </a>
+
+                                            <a type="button" class="btn btn-primary btn-md text-decoration-none"
                                                t-attf-href="/nfcpurchase/view/purchase-event/print-delivery/{{pe.id}}"
-                                               target="_blank"
-                                               data-toggle="tooltip" title="Print Delivery"
-                                            >
-                                                <i class="bx bxs-car"/>
+                                               target="_blank" data-toggle="tooltip" title="Print Surat Jalan">
+                                                <i class="bx bxs-truck"/>
                                             </a>
 
                                             <a type="button" class="btn btn-primary btn-md"
                                                t-attf-href="/nfcpurchase/view/purchase-event/print-payments/{{pe.id}}"
-                                               target="_blank"
-                                               data-toggle="tooltip" title="Print Payments"
-                                            >
+                                               target="_blank" data-toggle="tooltip" title="Print Payments">
                                                 <i class="bx bxs-credit-card"/>
                                             </a>
                                         </td>
@@ -282,81 +326,111 @@
                         </table>
                     </section>
 
-                    <section id="sectionOdooPO" class="mt-2">
-                        <div class="row mt-4">
-                            <div class="col-3">
-                                <div>Odoo PO#</div>
-                                <div><b><t t-esc="po_odoo.name"/></b></div>
-                            </div>
-                            <div class="col-3">
-                                <div>Vendor</div>
-                                <div><b><t t-esc="po_odoo.partner_id.display_name"/></b></div>
-                            </div>
-                            <div class="col-3">
-                                <div>Ref</div>
-                                <div><b><t t-esc="po_odoo.partner_ref"/></b></div>
-                            </div>
-                        </div>
+<!--                    <section id="sectionOdooPO" class="mt-2">-->
+<!--                        <div class="row mt-4">-->
+<!--                            <div class="col-3">-->
+<!--                                <div>Odoo PO#</div>-->
+<!--                                <div>-->
+<!--                                    <b>-->
+<!--                                        <t t-esc="po_odoo.name"/>-->
+<!--                                    </b>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-3">-->
+<!--                                <div>Vendor</div>-->
+<!--                                <div>-->
+<!--                                    <b>-->
+<!--                                        <t t-esc="po_odoo.partner_id.display_name"/>-->
+<!--                                    </b>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-3">-->
+<!--                                <div>Ref</div>-->
+<!--                                <div>-->
+<!--                                    <b>-->
+<!--                                        <t t-esc="po_odoo.partner_ref"/>-->
+<!--                                    </b>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
-                        <table class="table table-hover align-middle mt-4">
-                            <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th class="text-end">Qty</th>
-                                <th class="text-end">Unit Price</th>
-                                <th class="text-end">Subtotal</th>
-                            </tr>
-                            </thead>
+<!--                        <table class="table table-hover align-middle mt-4">-->
+<!--                            <thead>-->
+<!--                                <tr>-->
+<!--                                    <th>Product</th>-->
+<!--                                    <th class="text-end">Qty</th>-->
+<!--                                    <th class="text-end">Unit Price</th>-->
+<!--                                    <th class="text-end">Subtotal</th>-->
+<!--                                </tr>-->
+<!--                            </thead>-->
 
-                            <t t-if="po_odoo.order_line">
-                                <tbody>
-                                <t t-set="grand_total" t-value="0"/>
-                                <t t-foreach="po_odoo.order_line" t-as="line">
-                                    <tr>
-                                        <td t-esc="line.name"/>
-                                        <td class="text-end"><span t-esc="line.product_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td class="text-end">Rp <span t-esc="line.price_unit" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td class="text-end">Rp <span t-esc="line.price_unit * line.product_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                    </tr>
+<!--                            <t t-if="po_odoo.order_line">-->
+<!--                                <tbody>-->
+<!--                                    <t t-set="grand_total" t-value="0"/>-->
+<!--                                    <t t-foreach="po_odoo.order_line" t-as="line">-->
+<!--                                        <tr>-->
+<!--                                            <td t-esc="line.name"/>-->
+<!--                                            <td class="text-end">-->
+<!--                                                <span t-esc="line.product_qty"-->
+<!--                                                      t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-end">Rp-->
+<!--                                                <span t-esc="line.price_unit"-->
+<!--                                                      t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-end">Rp-->
+<!--                                                <span t-esc="line.price_unit * line.product_qty"-->
+<!--                                                      t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
 
-                                    <t t-set="grand_total" t-value="grand_total + (line.price_unit * line.product_qty)"/>
-                                </t>
-                                </tbody>
+<!--                                        <t t-set="grand_total"-->
+<!--                                           t-value="grand_total + (line.price_unit * line.product_qty)"/>-->
+<!--                                    </t>-->
+<!--                                </tbody>-->
 
-                                <tfoot>
-                                <tr>
-                                    <th colspan="3">Grand Total</th>
-                                    <td class="text-end">Rp <span t-esc="grand_total" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                </tr>
-                                </tfoot>
-                            </t>
-                            <t t-else="">
-                                <tr>
-                                    <td colspan="4" class="text-center">N/A</td>
-                                </tr>
-                            </t>
-                        </table>
-                    </section>
+<!--                                <tfoot>-->
+<!--                                    <tr>-->
+<!--                                        <th colspan="3">Grand Total</th>-->
+<!--                                        <td class="text-end">Rp-->
+<!--                                            <span t-esc="grand_total" t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </tfoot>-->
+<!--                            </t>-->
+<!--                            <t t-else="">-->
+<!--                                <tr>-->
+<!--                                    <td colspan="4" class="text-center">N/A</td>-->
+<!--                                </tr>-->
+<!--                            </t>-->
+<!--                        </table>-->
+<!--                    </section>-->
                 </t>
 
                 <t t-if="purchase_orders">
+                    <t t-set="po_odoo"
+                       t-value="request.env['purchase.order'].browse(purchase_event.purchase_order_odoo_true_id)"/>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a t-attf-href="/nfcpurchase/view/purchase-event/{{purchase_event.purchase_order_odoo_true_id.id}}"
-                                    class="text-decoration-none">
-                                    <t t-esc="purchase_event.purchase_order_odoo_true_id.name"/>
+                                <a t-attf-href="/nfcpurchase/view/purchase-event/{{purchase_event.purchase_order_odoo_true_id}}"
+                                   class="text-decoration-none">
+                                    <t t-esc="po_odoo.name"/>
                                 </a>
                             </li>
-                            <li class="breadcrumb-item" aria-current="page"><span t-esc="purchase_event.name"/></li>
+                            <li class="breadcrumb-item" aria-current="page">
+                                <span t-esc="purchase_event.name"/>
+                            </li>
                         </ol>
                     </nav>
 
-                    <h1>Purchase Event <span t-esc="purchase_event.name"/></h1>
+                    <h1>Purchase Event
+                        <span t-esc="purchase_event.name"/>
+                    </h1>
 
-                    <nav class="nav nav-pills nav-fill mt-4">
+                    <nav class="nav nav-pills nav-fill mt-4" style="width:30%;">
                         <a class="nav-link" aria-current="page" href="#sectionPurchase">Purchase</a>
-                        <a class="nav-link" href="#sectionOdooPO">Odoo PO Info</a>
+<!--                        <a class="nav-link" href="#sectionOdooPO">Odoo PO Info</a>-->
                     </nav>
 
                     <section id="sectionPurchase">
@@ -366,91 +440,178 @@
                                     <th>Order#</th>
                                     <th>Farmer Code</th>
                                     <th>Farmer</th>
+                                    <th>Certification Status</th>
+                                    <th class="text-end">Qty</th>
                                     <th class="text-end">Total</th>
                                     <th>Status</th>
-                                    <th class="text-center">Paid</th>
+<!--                                    <th class="text-center">Paid</th>-->
+                                    <th class="text-end">Total Payment</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="purchase_orders" t-as="po">
+                                <t t-set="total_payment_po" t-value="0"/>
+                                <t t-set="total_purchase_po" t-value="0"/>
+                                <t t-set="total_po_qty_count" t-value="0"/>
+                                <t t-foreach="purchase_orders.sorted(key=lambda x: x.name)" t-as="po">
+                                    <t t-set="po_qty_count" t-value="0"/>
+                                    <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/>
+                                    <t t-foreach="po_lines" t-as="po_line">
+                                        <t t-set="po_qty_count" t-value="po_qty_count+po_line.qty"/>
+                                    </t>
+                                    <t t-set="total_po_qty_count" t-value="total_po_qty_count+po_qty_count"/>
                                     <t t-set="farmer" t-value="po.farmer_odoo_true_id"/>
+                                    <t t-set="money_entries"
+                                       t-value="request.env['nfcpurchase.money'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/>
+                                    <t t-set="total_payments" t-value="sum(money.amount for money in money_entries)"/>
                                     <tr>
-                                        <td><span t-esc="po.name"/></td>
-                                        <td><span t-esc="farmer.code"/></td>
-                                        <td><span t-esc="farmer.farmer_name"/></td>
-                                        <td class="text-end">Rp <span t-esc="compute_grand_total(po)" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td><span t-esc="po.status"/></td>
-                                        <td class="text-center"><i class="bx bx-check-square bx-sm"/></td>
+                                        <td>
+                                            <span t-esc="po.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="farmer.code"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="farmer.farmer_name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="farmer.certification_status_id.name"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-esc="po_qty_count"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
+                                        <td class="text-end">Rp
+                                            <span t-esc="compute_grand_total(po)"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="po.status"/>
+                                        </td>
+<!--                                        <td class="text-center">-->
+<!--                                            <t t-if="po.is_paid">-->
+<!--                                                <i class="bx bx-check-square bx-sm"/>-->
+<!--                                            </t>-->
+<!--                                            <t t-else="">-->
+<!--                                                <i class="bx bx-square bx-sm"/>-->
+<!--                                            </t>-->
+<!--                                        </td>-->
+                                        <td class="text-end">Rp
+                                            <span t-esc="total_payments"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/>
+                                        </td>
                                         <td class="text-center">
                                             <a type="button" class="btn btn-primary btn-md text-decoration-none"
                                                t-attf-href="/nfcpurchase/view/purchase-order/{{po.id}}"
-                                               data-toggle="tooltip" title="Open"
-                                            >
+                                               data-toggle="tooltip" title="Open">
                                                 <i class="bx bxs-door-open"/>
                                             </a>
                                         </td>
                                     </tr>
+                                    <t t-set="total_payment_po" t-value="total_payment_po+total_payments"/>
+                                    <t t-set="total_purchase_po" t-value="total_purchase_po+compute_grand_total(po)"/>
                                 </t>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Total :</th>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <th class="text-end">
+                                        <span t-esc="total_po_qty_count"
+                                              t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </th>
+                                    <th style="text-align : right;">Rp. <span t-esc="total_purchase_po"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/></th>
+                                    <td/>
+                                     <th style="text-align : right;">Rp. <span t-esc="total_payment_po"
+                                                  t-options="{'widget': 'float', 'precision': 2}"/></th>
+                                    <td/>
+                                </tr>
+                            </tfoot>
                         </table>
                     </section>
 
-                    <section id="sectionOdooPO" class="mt-2">
-                        <div class="row mt-4">
-                            <div class="col-3">
-                                <div>Odoo PO#</div>
-                                <div><b><t t-esc="po_odoo.name"/></b></div>
-                            </div>
-                            <div class="col-3">
-                                <div>Vendor</div>
-                                <div><b><t t-esc="po_odoo.partner_id.display_name"/></b></div>
-                            </div>
-                            <div class="col-3">
-                                <div>Ref</div>
-                                <div><b><t t-esc="po_odoo.partner_ref"/></b></div>
-                            </div>
-                        </div>
+<!--                    <section id="sectionOdooPO" class="mt-2">-->
+<!--                        <div class="row mt-4">-->
+<!--                            <div class="col-3">-->
+<!--                                <div>Odoo PO#</div>-->
+<!--                                <div>-->
+<!--                                    <b>-->
+<!--                                        <t t-esc="po_odoo.name"/>-->
+<!--                                    </b>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-3">-->
+<!--                                <div>Vendor</div>-->
+<!--                                <div>-->
+<!--                                    <b>-->
+<!--                                        <t t-esc="po_odoo.partner_id.display_name"/>-->
+<!--                                    </b>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-3">-->
+<!--                                <div>Ref</div>-->
+<!--                                <div>-->
+<!--                                    <b>-->
+<!--                                        <t t-esc="po_odoo.partner_ref"/>-->
+<!--                                    </b>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
-                        <table class="table table-hover align-middle mt-4">
-                            <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th class="text-end">Qty</th>
-                                <th class="text-end">Unit Price</th>
-                                <th class="text-end">Subtotal</th>
-                            </tr>
-                            </thead>
+<!--                        <table class="table table-hover align-middle mt-4">-->
+<!--                            <thead>-->
+<!--                                <tr>-->
+<!--                                    <th>Product</th>-->
+<!--                                    <th class="text-end">Qty</th>-->
+<!--                                    <th class="text-end">Unit Price</th>-->
+<!--                                    <th class="text-end">Subtotal</th>-->
+<!--                                </tr>-->
+<!--                            </thead>-->
 
-                            <t t-if="po_odoo.order_line">
-                                <tbody>
-                                <t t-set="grand_total" t-value="0"/>
-                                <t t-foreach="po_odoo.order_line" t-as="line">
-                                    <tr>
-                                        <td t-esc="line.name"/>
-                                        <td class="text-end"><span t-esc="line.product_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td class="text-end">Rp <span t-esc="line.price_unit" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                        <td class="text-end">Rp <span t-esc="line.price_unit * line.product_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                    </tr>
+<!--                            <t t-if="po_odoo.order_line">-->
+<!--                                <tbody>-->
+<!--                                    <t t-set="grand_total" t-value="0"/>-->
+<!--                                    <t t-foreach="po_odoo.order_line" t-as="line">-->
+<!--                                        <tr>-->
+<!--                                            <td t-esc="line.name"/>-->
+<!--                                            <td class="text-end">-->
+<!--                                                <span t-esc="line.product_qty"-->
+<!--                                                      t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-end">Rp-->
+<!--                                                <span t-esc="line.price_unit"-->
+<!--                                                      t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-end">Rp-->
+<!--                                                <span t-esc="line.price_unit * line.product_qty"-->
+<!--                                                      t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
 
-                                    <t t-set="grand_total" t-value="grand_total + (line.price_unit * line.product_qty)"/>
-                                </t>
-                                </tbody>
+<!--                                        <t t-set="grand_total"-->
+<!--                                           t-value="grand_total + (line.price_unit * line.product_qty)"/>-->
+<!--                                    </t>-->
+<!--                                </tbody>-->
 
-                                <tfoot>
-                                <tr>
-                                    <th colspan="3">Grand Total</th>
-                                    <td class="text-end">Rp <span t-esc="grand_total" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                </tr>
-                                </tfoot>
-                            </t>
-                            <t t-else="">
-                                <tr>
-                                    <td colspan="4" class="text-center">N/A</td>
-                                </tr>
-                            </t>
-                        </table>
-                    </section>
+<!--                                <tfoot>-->
+<!--                                    <tr>-->
+<!--                                        <th colspan="3">Grand Total</th>-->
+<!--                                        <td class="text-end">Rp-->
+<!--                                            <span t-esc="grand_total" t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </tfoot>-->
+<!--                            </t>-->
+<!--                            <t t-else="">-->
+<!--                                <tr>-->
+<!--                                    <td colspan="4" class="text-center">N/A</td>-->
+<!--                                </tr>-->
+<!--                            </t>-->
+<!--                        </table>-->
+<!--                    </section>-->
                 </t>
             </div>
 
@@ -489,54 +650,105 @@
             <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
             <title>Print Purchase Event</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+            <style>
+                .table td, .table th {
+                    white-space: nowrap;
+                }
+                .table .allow-wrap {
+                    white-space: normal;
+                }
+            </style>
         </head>
         <body>
+            <div class="table-responsive">
             <table class="table table-sm table-bordered border-dark align-middle">
                 <thead>
                     <tr>
                         <th class="text-center">No</th>
+                        <th>Order#</th>
+                        <th>Farmer Code</th>
+                        <th>Farmer Name</th>
+                        <th>Certification Status</th>
                         <th>Product</th>
                         <th class="text-end">Price Unit</th>
                         <th class="text-end">Quantity</th>
                         <th class="text-end">Subtotal</th>
+                        <th>Organic</th>
                         <th>QR Code</th>
-                        <th>Note</th>
+                        <th>Order Note</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>
+                        <th>Surat Jalan</th>
+                        <th>Sent Date</th>
+                        <th>Received Date</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Driver</th>
+                        <th>Vehicle Number</th>
+                        <th>Status</th>
+                        <th>Delivery Note</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     <t t-set="idx" t-value="1"/>
                     <t t-set="total_price" t-value="0"/>
-                    <t t-foreach="purchase_order_lines" t-as="line">
+                         <t t-set="total_qty" t-value="0"/>
+                    <t t-set="purchase_order_uniq_ids" t-value="set()"/>
+                    <t t-foreach="purchase_order_lines.sorted(key=lambda r: r.purchase_order_id)" t-as="line">
                         <t t-set="product_odoo" t-value="line.product_odoo_true_id"/>
+                        <t t-set="purchase_order_uniq" t-value="request.env['nfcpurchase.purchase.order'].search([('uniq_id','=',line.purchase_order_uniq_id)])"/>
+                        <t t-set="purchase_order_uniq_ids" t-value="purchase_order_uniq_ids | set([line.purchase_order_uniq_id])"/>
+                        <t t-set="delivery_order_uniq" t-value="request.env['nfcpurchase.delivery.order'].search([('uniq_id','=',line.delivery_order_uniq_id)])"/>
+                        <t t-set="money_uniq" t-value="request.env['nfcpurchase.money'].search([('purchase_order_uniq_id', '=', line.purchase_order_uniq_id)])"/>
                         <tr>
                             <td class="text-center"><span t-esc="idx"/></td>
+                            <td><span t-esc="purchase_order_uniq.name"/></td>
+                            <td><span t-esc="purchase_order_uniq.farmer_odoo_true_id.code"/></td>
+                            <td><span t-esc="purchase_order_uniq.farmer_odoo_true_id.farmer_name"/></td>
+                            <td><span t-esc="purchase_order_uniq.farmer_odoo_true_id.certification_status_id.name"/></td>
                             <td><span t-esc="product_odoo.display_name"/></td>
                             <td class="text-end">Rp <span t-esc="line.unit_price" t-options="{'widget': 'float', 'precision': 2}"/></td>
                             <td class="text-end"><span t-esc="line.qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
                             <td class="text-end">Rp <span t-esc="line.subtotal" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                            <td><span t-esc="line.is_organic"/></td>
                             <td><span t-esc="line.barcode"/></td>
                             <td><span t-esc="line.note"/></td>
+                            <td><span t-esc="purchase_order_uniq.status"/></td>
+                            <td><span t-esc="purchase_order_uniq.is_paid"/></td>
+                            <td><span t-esc="delivery_order_uniq.name"/></td>
+                            <td><span t-esc="delivery_order_uniq.sent_date"/></td>
+                            <td><span t-esc="delivery_order_uniq.received_date"/></td>
+                            <td><span t-esc="delivery_order_uniq.origin"/></td>
+                            <td><span t-esc="delivery_order_uniq.destination"/></td>
+                            <td><span t-esc="delivery_order_uniq.driver"/></td>
+                            <td><span t-esc="delivery_order_uniq.vehicle_number"/></td>
+                            <td><span t-esc="delivery_order_uniq.status"/></td>
+                            <td><span t-esc="delivery_order_uniq.note"/></td>
                         </tr>
                         <t t-set="idx" t-value="idx + 1"/>
                         <t t-set="total_price" t-value="total_price + line.subtotal"/>
+                        <t t-set="total_qty" t-value="total_qty + line.qty"/>
                     </t>
                     <t t-if="not purchase_order_lines">
                         <tr>
-                            <td colspan="7" class="text-center">N/A</td>
+                            <td colspan="22" class="text-center">N/A</td>
                         </tr>
                     </t>
                 </tbody>
 
-                <tfoot t-if="purchase_order_lines">
+                <tfoot>
+                    <t t-set="purchase_order_uniq_ids" t-value="list(purchase_order_uniq_ids)"/>
                     <tr>
                         <td/>
-                        <td colspan="3"><b>Grand Total</b></td>
+                        <td colspan="6"><b>Total</b></td>
+                        <td class="text-end"><span t-esc="total_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
                         <td class="text-end">Rp <span t-esc="total_price" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                        <td colspan="2"/>
+                        <td colspan="13"/>
                     </tr>
                 </tfoot>
             </table>
+            </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"/>
         </body>
@@ -551,8 +763,17 @@
             <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
             <title>Print Payments Purchase Event</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+            <style>
+                .table td, .table th {
+                    white-space: nowrap;
+                }
+                .table .allow-wrap {
+                    white-space: normal;
+                }
+            </style>
         </head>
         <body>
+            <div class="table-responsive">
             <table class="table table-sm table-bordered border-dark align-middle">
                 <thead>
                     <tr>
@@ -568,7 +789,8 @@
 
                 <tbody>
                     <t t-set="idx" t-value="1"/>
-                    <t t-foreach="money_entries" t-as="money">
+                    <t t-set="total_amount" t-value="0"/>
+                    <t t-foreach="money_entries.sorted(key=lambda r: r.purchase_order_id)" t-as="money">
                         <t t-set="money_purchase_order" t-value="get_purchase_order(money.purchase_order_uniq_id)"/>
                         <tr>
                             <td class="text-center"><span t-esc="idx"/></td>
@@ -586,6 +808,7 @@
                             <td><span t-esc="money.note"/></td>
                         </tr>
                         <t t-set="idx" t-value="idx + 1"/>
+                        <t t-set="total_amount" t-value="total_amount + money.amount"/>
                     </t>
                     <t t-if="idx == 1">
                         <tr>
@@ -593,7 +816,17 @@
                         </tr>
                     </t>
                 </tbody>
+
+                <tfoot t-if="money_entries">
+                    <tr>
+                        <td/>
+                        <td>Total</td>
+                        <td class="text-end" colspan="3">Rp <span t-esc="total_amount" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                        <td colspan="2"/>
+                    </tr>
+                </tfoot>
             </table>
+            </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"/>
         </body>
@@ -608,8 +841,18 @@
             <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
             <title>Print Delivery Purchase Event</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'/>
+            <style>
+                .table td, .table th {
+                    white-space: nowrap;
+                }
+                .table .allow-wrap {
+                    white-space: normal;
+                }
+            </style>
         </head>
         <body>
+            <div class="table-responsive">
             <table class="table table-sm table-bordered border-dark align-middle">
                 <thead>
                     <tr>
@@ -621,14 +864,21 @@
                         <th>Destination</th>
                         <th>Driver</th>
                         <th>Vehicle Number</th>
+                        <th class="text-end">Quantity</th>
                         <th>Status</th>
                         <th>Note</th>
+                        <th/>
                     </tr>
                 </thead>
 
                 <tbody>
                     <t t-set="idx" t-value="1"/>
                     <t t-foreach="delivery_orders" t-as="delivery">
+                      <t t-set="qty_count" t-value="0"/>
+                      <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('delivery_order_uniq_id', '=', delivery.uniq_id)])"/>
+                      <t t-foreach="po_lines" t-as="line">
+                        <t t-set="qty_count" t-value="qty_count+line.qty"/>
+                      </t>
                         <tr>
                             <td><span t-esc="idx"/></td>
                             <td><span t-esc="delivery.name"/></td>
@@ -638,8 +888,15 @@
                             <td><span t-esc="delivery.destination"/></td>
                             <td><span t-esc="delivery.driver"/></td>
                             <td><span t-esc="delivery.vehicle_number"/></td>
+                            <td class="text-end"><span t-esc="qty_count"
+                                  t-options="{'widget': 'float', 'precision': 2}"/></td>
                             <td><span t-esc="delivery.status"/></td>
                             <td><span t-esc="delivery.note"/></td>
+                            <td class="text-center">
+                                <a type="button" class="btn btn-primary btn-md" t-attf-href="/nfcapp-surat-jalan?do_odoo_id={{delivery.id}}" target="_blank" data-toggle="tooltip" title="Print Surat Jalan">
+                                    <i class="bx bxs-printer"/>
+                                </a>
+                            </td>
                         </tr>
                         <t t-set="idx" t-value="idx+1"/>
                     </t>
@@ -650,6 +907,7 @@
                     </t>
                 </tbody>
             </table>
+            </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"/>
         </body>
