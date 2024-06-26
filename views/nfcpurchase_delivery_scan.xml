@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="nfcpurchase_delivery_scan_tree_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.delivery.scan.tree.view</field>
+        <field name="model">nfcpurchase.delivery.scan</field>
+        <field name="arch" type="xml">
+            <tree string="Delivery Scan">
+                <field name="delivery_order_uniq_id"/>
+                <field name="barcode"/>
+                <field name="qty"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="nfcpurchase_delivery_scan_form_view" model="ir.ui.view">
+        <field name="name">nfcpurchase.delivery.scan.form.view</field>
+        <field name="model">nfcpurchase.delivery.scan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="delivery_order_uniq_id"/>
+                        <field name="barcode"/>
+                        <field name="qty"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_nfcpurchase_delivery_scan">
+        <field name="name">Delivery Scan</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">nfcpurchase.delivery.scan</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Delivery Scan" id="menu_nfcpurchase_delivery_scan" parent="menu_child_nfcpurchase"
+              action="action_nfcpurchase_delivery_scan"
+              sequence="60"/>
+
+</odoo>
