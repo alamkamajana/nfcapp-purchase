@@ -32,7 +32,6 @@
                     <nav class="nav nav-pills nav-fill mt-4" style="width: 50%;">
                         <a class="nav-link" aria-current="page" href="#sectionPurchaseEvents">Purchase Event List</a>
                         <div class="ms-2" style="display: flex; flex-direction: row; align-items: center;">
-                        <div groups="base.group_system">
                             <a type="button" class="btn btn-primary btn-md text-decoration-none"
                                 t-attf-href="/nfcpurchase/view/purchase-event-all/?po_odoo_id={{po_odoo.id}}"
                                 data-toggle="tooltip" title="All Purchase"
@@ -46,118 +45,113 @@
                                 <i class="bx bxs-printer"/>
                             </a>
                             <a type="button" class="btn btn-primary btn-md text-decoration-none ms-1"
-                                t-attf-href="/nfcpurchase/view/purchase-event-all/print/?po_odoo_id={{po_odoo.id}}"
+                                t-attf-href="/nfcpurchase/view/purchase-event-all/print-delivery/?po_odoo_id={{po_odoo.id}}"
                                 target="_blank" data-toggle="tooltip" title="Print All Surat Jalan"
                             >
                                 <i class="bx bxs-truck"/>
                             </a>
                             <a type="button" class="btn btn-primary btn-md text-decoration-none ms-1"
-                                t-attf-href="/nfcpurchase/view/purchase-event-all/print/?po_odoo_id={{po_odoo.id}}"
+                                t-attf-href="/nfcpurchase/view/purchase-event-all/print-payments/?po_odoo_id={{po_odoo.id}}"
                                 target="_blank" data-toggle="tooltip" title="Print All Payments"
                             >
                                 <i class="bx bxs-credit-card"/>
                             </a>
                         </div>
-                        </div>
                     </nav>
 
                     <section id="sectionPurchaseEvents">
-                        <table class="table table-hover align-middle mt-4">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Purchase Event</th>
-                                    <th>Note</th>
-                                    <th class="text-end">Qty</th>
-                                       <th class="text-end">Subtotal</th>
-                                    <th class="text-end">Cash Out</th>
-                                    <th class="text-end">Cash In</th>
-                                    <th class="text-end">Cash Balance</th>
+                        <!--<table class="table table-hover align-middle mt-4">-->
+                        <!--    <thead>-->
+                        <!--        <tr>-->
+                        <!--            <th>Date</th>-->
+                        <!--            <th>Purchase Event</th>-->
+                        <!--            <th>Note</th>-->
+                        <!--            <th class="text-end">Qty</th>-->
+                        <!--            <th class="text-end">Subtotal</th>-->
+                        <!--            <th class="text-end">Cash Out</th>-->
+                        <!--            <th class="text-end">Cash In</th>-->
+                        <!--            <th class="text-end">Cash Balance</th>-->
                                     <!--<th class="text-center">Actions</th>-->
-                                    <th class="text-center"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <t t-foreach="purchase_events" t-as="pe">
-                                  <t t-set="qty_count" t-value="0"/>
-                                        <t t-set="subtotal_count" t-value="0"/>
-                                  <t t-set="purchase_orders" t-value="request.env['nfcpurchase.purchase.order'].search([('purchase_event_uniq_id', '=', pe.uniq_id)])"/>
-                                  <t t-foreach="purchase_orders" t-as="po">
-                                    <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/>
-                                    <t t-foreach="po_lines" t-as="po_line">
-                                      <t t-set="qty_count" t-value="qty_count+po_line.qty"/>
-                                       <t t-set="subtotal_count" t-value="subtotal_count+po_line.subtotal"/>
-                                    </t>
-                                  </t>
-                                    <tr>
-                                        <td>
-                                            <span t-esc="pe.date_stamp"/>
-                                        </td>
-                                        <td>
-                                            <span t-esc="pe.name"/>
-                                        </td>
-                                        <td>
-                                            <span t-esc="pe.note"/>
-                                        </td>
-                                        <td  class="text-end">
-                                            <span t-esc="qty_count"
-                                                  t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
-                                          <td  class="text-end">
-                                           Rp. <span t-esc="subtotal_count"
-                                                  t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
-                                        <td class="text-end">Rp
-                                            <span t-esc="compute_money_in(pe.uniq_id)"
-                                                  t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
-                                        <td class="text-end">Rp
-                                            <span t-esc="compute_money_out(pe.uniq_id)"
-                                                  t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
-                                        <td class="text-end">Rp
-                                            <span t-esc="compute_balance(pe.uniq_id)"
-                                                  t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
-                                        <td class="text-center">
+                        <!--            <th class="text-center"></th>-->
+                        <!--        </tr>-->
+                        <!--    </thead>-->
+                        <!--    <tbody>-->
+                        <!--        <t t-foreach="purchase_events" t-as="pe">-->
+                        <!--          <t t-set="qty_count" t-value="0"/>-->
+                        <!--                <t t-set="subtotal_count" t-value="0"/>-->
+                        <!--          <t t-set="purchase_orders" t-value="request.env['nfcpurchase.purchase.order'].search([('purchase_event_uniq_id', '=', pe.uniq_id)])"/>-->
+                        <!--          <t t-foreach="purchase_orders" t-as="po">-->
+                        <!--            <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/> -->
+                        <!--            <t t-foreach="po_lines" t-as="po_line">-->
+                        <!--              <t t-set="qty_count" t-value="qty_count+po_line.qty"/>-->
+                        <!--               <t t-set="subtotal_count" t-value="subtotal_count+po_line.subtotal"/>-->
+                        <!--            </t>-->
+                        <!--          </t>-->
+                        <!--            <tr>-->
+                        <!--                <td>-->
+                        <!--                    <span t-esc="pe.date_stamp"/>-->
+                        <!--                </td>-->
+                        <!--                <td>-->
+                        <!--                    <span t-esc="pe.name"/>-->
+                        <!--                </td>-->
+                        <!--                <td>-->
+                        <!--                    <span t-esc="pe.note"/>-->
+                        <!--                </td>-->
+                        <!--                <td  class="text-end">-->
+                        <!--                    <span t-esc="qty_count"-->
+                        <!--                          t-options="{'widget': 'float', 'precision': 2}"/>-->
+                        <!--                </td>-->
+                        <!--                  <td  class="text-end">-->
+                        <!--                   Rp. <span t-esc="subtotal_count"-->
+                        <!--                          t-options="{'widget': 'float', 'precision': 2}"/>-->
+                        <!--                </td>-->
+                        <!--                <td class="text-end">Rp-->
+                        <!--                    <span t-esc="compute_money_in(pe.uniq_id)"-->
+                        <!--                          t-options="{'widget': 'float', 'precision': 2}"/>-->
+                        <!--                </td>-->
+                        <!--                <td class="text-end">Rp-->
+                        <!--                    <span t-esc="compute_money_out(pe.uniq_id)"-->
+                        <!--                          t-options="{'widget': 'float', 'precision': 2}"/>-->
+                        <!--                </td>-->
+                        <!--                <td class="text-end">Rp-->
+                        <!--                    <span t-esc="compute_balance(pe.uniq_id)"-->
+                        <!--                          t-options="{'widget': 'float', 'precision': 2}"/>-->
+                        <!--                </td>-->
+                        <!--                <td class="text-center">-->
 
-                                        </td>
+                        <!--                </td>-->
 
-                                        <td class="text-center">
-                                            <a type="button" class="btn btn-primary btn-md text-decoration-none"
-                                               t-attf-href="/nfcpurchase/view/purchase-event/{{po_odoo.id}}?pe_id={{pe.id}}"
-                                               data-toggle="tooltip" title="Purchase">
-                                                <i class="bx bxs-cart"/>
-                                            </a>
+                        <!--                <td class="text-center">-->
+                        <!--                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
+                        <!--                       t-attf-href="/nfcpurchase/view/purchase-event/{{po_odoo.id}}?pe_id={{pe.id}}"-->
+                        <!--                       data-toggle="tooltip" title="Purchase">-->
+                        <!--                        <i class="bx bxs-cart"/>-->
+                        <!--                    </a>-->
 
-                                            <a type="button" class="btn btn-primary btn-md text-decoration-none"
-                                               t-attf-href="/nfcpurchase/view/purchase-event/print/{{pe.id}}"
-                                               target="_blank" data-toggle="tooltip" title="Print Order Lines">
-                                                <i class="bx bxs-printer"/>
-                                            </a>
+                        <!--                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
+                        <!--                       t-attf-href="/nfcpurchase/view/purchase-event/print/{{pe.id}}"-->
+                        <!--                       target="_blank" data-toggle="tooltip" title="Print Order Lines">-->
+                        <!--                        <i class="bx bxs-printer"/>-->
+                        <!--                    </a>-->
 
-                                            <a type="button" class="btn btn-primary btn-md text-decoration-none"
-                                               t-attf-href="/nfcpurchase/view/purchase-event/print-delivery/{{pe.id}}"
-                                               target="_blank" data-toggle="tooltip" title="Print Surat Jalan">
-                                                <i class="bx bxs-truck"/>
-                                            </a>
+                        <!--                    <a type="button" class="btn btn-primary btn-md text-decoration-none"-->
+                        <!--                       t-attf-href="/nfcpurchase/view/purchase-event/print-delivery/{{pe.id}}"-->
+                        <!--                       target="_blank" data-toggle="tooltip" title="Print Surat Jalan">-->
+                        <!--                        <i class="bx bxs-truck"/>-->
+                        <!--                    </a>-->
 
-                                            <a type="button" class="btn btn-primary btn-md"
-                                               t-attf-href="/nfcpurchase/view/purchase-event/print-payments/{{pe.id}}"
-                                               target="_blank" data-toggle="tooltip" title="Print Payments">
-                                                <i class="bx bxs-credit-card"/>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
-                    </section>
+                        <!--                    <a type="button" class="btn btn-primary btn-md"-->
+                        <!--                       t-attf-href="/nfcpurchase/view/purchase-event/print-payments/{{pe.id}}"-->
+                        <!--                       target="_blank" data-toggle="tooltip" title="Print Payments">-->
+                        <!--                        <i class="bx bxs-credit-card"/>-->
+                        <!--                    </a>-->
+                        <!--                </td>-->
+                        <!--            </tr>-->
+                        <!--        </t>-->
+                        <!--    </tbody>-->
+                        <!--</table>-->
 
-                    <br/>
 
-                    <div groups="base.group_system" class="d-none">
-                        <h6>base group system</h6>
                         <table class="table table-hover align-middle mt-4">
                             <thead>
                                 <tr>
@@ -294,7 +288,7 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                    </section>
                 </t>
 
 
