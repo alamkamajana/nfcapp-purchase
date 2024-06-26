@@ -5,3 +5,4 @@ access_nfcpurchase_purchase_order_line,access.nfcpurchase_purchase_order_line,mo
 access_nfcpurchase_payment,access.nfcpurchase_payment,model_nfcpurchase_payment,base.group_user,1,1,1,1
 access_nfcpurchase_delivery_order,access.nfcpurchase_delivery_order,model_nfcpurchase_delivery_order,base.group_user,1,1,1,1
 access_nfcpurchase_money,access.nfcpurchase_money,model_nfcpurchase_money,base.group_user,1,1,1,1
+access_nfcpurchase_delivery_scan,access.nfcpurchase_delivery_scan,model_nfcpurchase_delivery_scan,base.group_user,1,1,1,1

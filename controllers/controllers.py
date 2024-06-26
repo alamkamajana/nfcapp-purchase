@@ -6,6 +6,7 @@ from werkzeug.utils import redirect
 from odoo import http
 from odoo.http import request, Response
 from typing import List, Union
+from datetime import datetime, timedelta
 
 
 class Controller(http.Controller):
@@ -178,3 +179,99 @@ class Controller(http.Controller):
 
         return request.render("nfcapp-purchase.web_nfcpurchase_print_delivery_purchase_event", return_values)
 
+
+    @http.route("/nfcpurchase/scan/get-delivery-scan-record/", auth="user", type="http", website=True, methods=["GET"])
+    def get_delivery_scan_records(self, **kw):
+        current_time = datetime.now()
+        one_hour_ago = current_time - timedelta(hours=1)
+        delivery_scans = request.env["nfcpurchase.delivery.scan"].search([
+            ('write_date', '>=', one_hour_ago),
+            ('write_date', '<=', current_time)
+        ], order="write_date desc")
+
+        model_delivery_order = request.env["nfcpurchase.delivery.order"]
+        def get_delivery_order_name(delivery_order_uniq_id=None):
+            if delivery_order_uniq_id:
+                delivery_order = model_delivery_order.search([("uniq_id", "=", delivery_order_uniq_id)], limit=1)
+                return delivery_order.name
+            else:
+                return None
+
+        json_delivery_scans = [{
+            "id": delivery.id,
+            "delivery_order_name": get_delivery_order_name(delivery.delivery_order_uniq_id),
+            "barcode": delivery.barcode,
+            "qty": delivery.qty,
+        } for delivery in delivery_scans]
+
+        return json.dumps(json_delivery_scans)
+
+    @http.route("/nfcpurchase/scan/", auth="user", type="http", website=True)
+    def controller_delivery_scan(self, **kw):
+        return request.render("nfcapp-purchase.web_nfcpurchase_delivery_scan")
+
+    @http.route("/nfcpurchase/scan/<string:do_uniq_id>", auth="user", type="http", website=True)
+    def controller_delivery_scan_with_uniq_id(self, do_uniq_id, **kw):
+        return request.render("nfcapp-purchase.web_nfcpurchase_delivery_scan")
+
+
+    def compute_get_delivery_order_uniq_id(self, barcode):
+        model_delivery_scan = request.env["nfcpurchase.delivery.scan"]
+        order_lines = request.env["nfcpurchase.purchase.order.line"].search([("barcode", "=", barcode)],
+                                                                            order="create_date asc")
+        if order_lines:
+            for line in order_lines:
+                delivery_scans = model_delivery_scan.search([
+                    ("barcode", "=", barcode),
+                    ("delivery_order_uniq_id", "=", line.delivery_order_uniq_id)
+                ])
+                if delivery_scans:
+                    continue
+                else:
+                    return line.delivery_order_uniq_id
+            return None
+        else:
+            return None
+
+
+    @http.route("/nfcpurchase/scan/submit-delivery/", auth="user", type="http", website=True)
+    def submit_delivery_scan(self, **kw):
+        try:
+            barcode = kw.get("barcode")
+            qty = float(kw.get("qty"))
+
+            model_delivery_scan = request.env["nfcpurchase.delivery.scan"]
+            delivery_order_uniq_id = self.compute_get_delivery_order_uniq_id(barcode)
+            check_delivery_scan = model_delivery_scan.search([("barcode", "=", barcode),
+                                                              ("delivery_order_uniq_id", "=", False)], limit=1)
+
+            if check_delivery_scan:
+                new_delivery_scan = check_delivery_scan.write({
+                    "qty": qty,
+                    "delivery_order_uniq_id": delivery_order_uniq_id
+                })
+            else:
+                new_delivery_scan = model_delivery_scan.create({
+                    "barcode": barcode,
+                    "qty": qty,
+                    "delivery_order_uniq_id": delivery_order_uniq_id
+                })
+
+            if new_delivery_scan:
+                return json.dumps({"success": True})
+            else:
+                return json.dumps({"success": False})
+
+        except Exception as e:
+            return json.dumps({"message": "Something happened", "error": e})
+
+
+    @http.route("/nfcpurchase/scan/delete/", auth="user", type="http", website=True)
+    def delete_delivery_scan(self, **kw):
+        ds_id = int(kw.get("ds_id"))
+        delivery_scan_obj = request.env["nfcpurchase.delivery.scan"].browse(ds_id)
+        if delivery_scan_obj.exists():
+            delivery_scan_obj.sudo().unlink()
+            return json.dumps({"success": True})
+        else:
+            return json.dumps({"success": False})
