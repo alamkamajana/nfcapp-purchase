@@ -219,7 +219,7 @@
                                             <h1 class="modal-title fs-5" id="scannerModalLabel">QR Scanner</h1>
                                             <button type="button" id="closeScannerModal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                                         </div>
-                                        <div class="modal-body" style="height: 450px;">
+                                        <div class="modal-body" style="height: 400px;">
                                             <select id="cameraSelection" class="form-select mb-3">
                                                 <option value="">Select Camera</option>
                                             </select>
@@ -329,8 +329,6 @@
                                     $('#clearInputBtn').click();
                                     $('#barcode').val('');
                                     $('#barcode').focus();
-                                    $('#modalScanner').show();
-                                    $('#modalScanner').hide();
                                 },
                                 error: function(error) {
                                     console.error("There was an error with the AJAX request", error);
@@ -441,7 +439,9 @@
                     function onScanSuccess(decodedText, decodedResult) {
                         $('#modalScanner').modal('hide');
                         $('#barcode').val(decodedText);
-                        $('#quantity').focus();
+                        setTimeout(() => {
+                            $('#quantity').focus();
+                        }, 500);
                     }
 
                     function onScanFailure(error) {
