@@ -171,7 +171,6 @@
                                     <th class="text-end">Purchase Cash Out</th>
                                     <th class="text-end">Purchase Cash In</th>
                                     <th class="text-end">Cash Balance</th>
-                                    <!--<th class="text-center">Actions</th>-->
                                     <th/>
                                 </tr>
                             </thead>
@@ -202,36 +201,12 @@
                                     <t t-set="computed_purchase_cash_out" t-value="sum(money.amount for money in money_entries if money.purchase_order_id and money.amount &lt; 0)"/>
                                     <t t-set="computed_balance" t-value="sum(money.amount for money in money_entries)"/>
 
-                                    <!--<t t-set="money_entries" t-value="request.env['nfcpurchase.money'].search([('purchase_event_uniq_id', '=', pe.uniq_id)])"/>-->
-
-                                    <!--<t t-set="computed_cash_in" t-value="0"/>-->
-                                    <!--<t t-set="computed_cash_out" t-value="0"/>-->
-                                    <!--<t t-set="computed_purchase_cash_in" t-value="0"/>-->
-                                    <!--<t t-set="computed_purchase_cash_out" t-value="0"/>-->
-                                    <!--<t t-set="computed_balance" t-value="0"/>-->
-
-                                    <!--<t t-foreach="money_entries" t-as="money">-->
-                                    <!--    <t t-if="not money.purchase_order_id and money.amount > 0">-->
-                                    <!--        <t t-set="computed_cash_in" t-value="computed_cash_in + money.amount"/>-->
-                                    <!--    </t>-->
-                                    <!--    <t t-if="not money.purchase_order_id and money.amount &lt; 0">-->
-                                    <!--        <t t-set="computed_cash_out" t-value="computed_cash_out + money.amount"/>-->
-                                    <!--    </t>-->
-                                    <!--    <t t-if="money.purchase_order_id and money.amount > 0">-->
-                                    <!--        <t t-set="computed_purchase_cash_in" t-value="computed_purchase_cash_in + money.amount"/>-->
-                                    <!--    </t>-->
-                                    <!--    <t t-if="money.purchase_order_id and money.amount &lt; 0">-->
-                                    <!--        <t t-set="computed_purchase_cash_out" t-value="computed_purchase_cash_out + money.amount"/>-->
-                                    <!--    </t>-->
-                                    <!--    <t t-set="computed_balance" t-value="computed_balance + money.amount"/>-->
-                                    <!--</t>-->
-
                                     <t t-set="total_qty" t-value="total_qty + qty_count"/>
                                     <t t-set="total_subtotal" t-value="total_subtotal + subtotal_count"/>
                                     <t t-set="total_cash_out" t-value="total_cash_out + computed_cash_out"/>
                                     <t t-set="total_cash_in" t-value="total_cash_in + computed_cash_in"/>
                                     <t t-set="total_purchase_cash_out" t-value="total_purchase_cash_out + computed_purchase_cash_out"/>
-                                    <t t-set="total_purchase_cash_in" t-value="total_purchase_cash_in + total_purchase_cash_in"/>
+                                    <t t-set="total_purchase_cash_in" t-value="total_purchase_cash_in + computed_purchase_cash_in"/>
                                     <t t-set="total_cash_balance" t-value="total_cash_balance + computed_balance"/>
 
 
@@ -262,11 +237,11 @@
                                                      t-options="{'widget': 'float', 'precision': 2}"/>
                                         </td>
                                         <td class="text-end">
-                                            Rp <span t-esc="computed_cash_out"
+                                            Rp <span t-esc="computed_purchase_cash_out"
                                                      t-options="{'widget': 'float', 'precision': 2}"/>
                                         </td>
                                         <td class="text-end">
-                                            Rp <span t-esc="computed_cash_in"
+                                            Rp <span t-esc="computed_purchase_cash_in"
                                                      t-options="{'widget': 'float', 'precision': 2}"/>
                                         </td>
                                         <td class="text-end">
