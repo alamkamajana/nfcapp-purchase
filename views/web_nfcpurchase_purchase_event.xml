@@ -160,10 +160,10 @@
                                     <th>Note</th>
                                     <th class="text-end">Qty</th>
                                     <th class="text-end">Subtotal</th>
-                                    <th class="text-end">Cash Out</th>
+                                    <!--<th class="text-end">Cash Out</th>-->
                                     <th class="text-end">Cash In</th>
-                                    <th class="text-end">Purchase Cash Out</th>
-                                    <th class="text-end">Purchase Cash In</th>
+                                    <!--<th class="text-end">Purchase Cash Out</th>-->
+                                    <th class="text-end">Paid to Farmer</th>
                                     <th class="text-end">Cash Balance</th>
                                     <th/>
                                 </tr>
@@ -171,10 +171,10 @@
                             <tbody>
                                 <t t-set="total_qty" t-value="0"/>
                                 <t t-set="total_subtotal" t-value="0"/>
-                                <t t-set="total_cash_out" t-value="0"/>
+                                <!--<t t-set="total_cash_out" t-value="0"/>-->
                                 <t t-set="total_cash_in" t-value="0"/>
                                 <t t-set="total_purchase_cash_out" t-value="0"/>
-                                <t t-set="total_purchase_cash_in" t-value="0"/>
+                                <!--<t t-set="total_purchase_cash_in" t-value="0"/>-->
                                 <t t-set="total_cash_balance" t-value="0"/>
 
                                 <t t-foreach="purchase_events" t-as="pe">
@@ -189,18 +189,18 @@
                                         </t>
                                     </t>
                                     <t t-set="money_entries" t-value="request.env['nfcpurchase.money'].search([('purchase_event_uniq_id', '=', pe.uniq_id)])"/>
-                                    <t t-set="computed_cash_in" t-value="sum(money.amount for money in money_entries if not money.purchase_order_id and money.amount > 0)"/>
-                                    <t t-set="computed_cash_out" t-value="sum(money.amount for money in money_entries if not money.purchase_order_id and money.amount &lt; 0)"/>
-                                    <t t-set="computed_purchase_cash_in" t-value="sum(money.amount for money in money_entries if money.purchase_order_id and money.amount > 0)"/>
-                                    <t t-set="computed_purchase_cash_out" t-value="sum(money.amount for money in money_entries if money.purchase_order_id and money.amount &lt; 0)"/>
+                                    <t t-set="computed_cash_in" t-value="sum(money.amount for money in money_entries if not money.purchase_order_id)"/>
+                                    <!--<t t-set="computed_cash_out" t-value="sum(money.amount for money in money_entries if not money.purchase_order_id and money.amount &lt; 0)"/>-->
+                                    <!--<t t-set="computed_purchase_cash_in" t-value="sum(money.amount for money in money_entries if money.purchase_order_id and money.amount > 0)"/>-->
+                                    <t t-set="computed_purchase_cash_out" t-value="sum(money.amount for money in money_entries if money.purchase_order_id)"/>
                                     <t t-set="computed_balance" t-value="sum(money.amount for money in money_entries)"/>
 
                                     <t t-set="total_qty" t-value="total_qty + qty_count"/>
                                     <t t-set="total_subtotal" t-value="total_subtotal + subtotal_count"/>
-                                    <t t-set="total_cash_out" t-value="total_cash_out + computed_cash_out"/>
+                                    <!--<t t-set="total_cash_out" t-value="total_cash_out + computed_cash_out"/>-->
                                     <t t-set="total_cash_in" t-value="total_cash_in + computed_cash_in"/>
                                     <t t-set="total_purchase_cash_out" t-value="total_purchase_cash_out + computed_purchase_cash_out"/>
-                                    <t t-set="total_purchase_cash_in" t-value="total_purchase_cash_in + computed_purchase_cash_in"/>
+                                    <!--<t t-set="total_purchase_cash_in" t-value="total_purchase_cash_in + computed_purchase_cash_in"/>-->
                                     <t t-set="total_cash_balance" t-value="total_cash_balance + computed_balance"/>
 
 
@@ -222,10 +222,10 @@
                                             Rp <span t-esc="subtotal_count"
                                                      t-options="{'widget': 'float', 'precision': 2}"/>
                                         </td>
-                                        <td class="text-end">
-                                            Rp <span t-esc="computed_cash_out"
-                                                     t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
+                                        <!--<td class="text-end">-->
+                                        <!--    Rp <span t-esc="computed_cash_out"-->
+                                        <!--             t-options="{'widget': 'float', 'precision': 2}"/>-->
+                                        <!--</td>-->
                                         <td class="text-end">
                                             Rp <span t-esc="computed_cash_in"
                                                      t-options="{'widget': 'float', 'precision': 2}"/>
@@ -234,10 +234,10 @@
                                             Rp <span t-esc="computed_purchase_cash_out"
                                                      t-options="{'widget': 'float', 'precision': 2}"/>
                                         </td>
-                                        <td class="text-end">
-                                            Rp <span t-esc="computed_purchase_cash_in"
-                                                     t-options="{'widget': 'float', 'precision': 2}"/>
-                                        </td>
+                                        <!--<td class="text-end">-->
+                                        <!--    Rp <span t-esc="computed_purchase_cash_in"-->
+                                        <!--             t-options="{'widget': 'float', 'precision': 2}"/>-->
+                                        <!--</td>-->
                                         <td class="text-end">
                                             Rp <span t-esc="computed_balance"
                                                   t-options="{'widget': 'float', 'precision': 2}"/>
@@ -280,14 +280,15 @@
                                     <td colspan="3" class="text-end"><b>Total:</b></td>
                                     <td class="text-end"><span t-esc="total_qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
                                     <td class="text-end">Rp <span t-esc="total_subtotal" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                    <td class="text-end">Rp <span t-esc="total_cash_out" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                    <!--<td class="text-end">Rp <span t-esc="total_cash_out" t-options="{'widget': 'float', 'precision': 2}"/></td>-->
                                     <td class="text-end">Rp <span t-esc="total_cash_in" t-options="{'widget': 'float', 'precision': 2}"/></td>
                                     <td class="text-end">Rp <span t-esc="total_purchase_cash_out" t-options="{'widget': 'float', 'precision': 2}"/></td>
-                                    <td class="text-end">Rp <span t-esc="total_purchase_cash_in" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                    <!--<td class="text-end">Rp <span t-esc="total_purchase_cash_in" t-options="{'widget': 'float', 'precision': 2}"/></td>-->
                                     <td class="text-end">Rp <span t-esc="total_cash_balance" t-options="{'widget': 'float', 'precision': 2}"/></td>
                                 </tr>
                             </tfoot>
                         </table>
+
                     </section>
                 </t>
 
@@ -339,10 +340,10 @@
                                 <t t-set="total_purchase_po" t-value="0"/>
                                 <t t-set="total_po_qty_count" t-value="0"/>
                                 <t t-foreach="purchase_orders.sorted(key=lambda x: x.name)" t-as="po">
-                                    <t t-set="po_qty_count" t-value="0"/>
-                                    <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/>
+                                  <t t-set="po_qty_count" t-value="0"/>
+                                  <t t-set="po_lines" t-value="request.env['nfcpurchase.purchase.order.line'].search([('purchase_order_uniq_id', '=', po.uniq_id)])"/>
                                     <t t-foreach="po_lines" t-as="po_line">
-                                        <t t-set="po_qty_count" t-value="po_qty_count+po_line.qty"/>
+                                      <t t-set="po_qty_count" t-value="po_qty_count+po_line.qty"/>
                                     </t>
                                     <t t-set="total_po_qty_count" t-value="total_po_qty_count+po_qty_count"/>
                                     <t t-set="farmer" t-value="po.farmer_odoo_true_id"/>
@@ -559,7 +560,10 @@
                         <th class="text-end">Price Unit</th>
                         <th class="text-end">Quantity</th>
                         <th class="text-end">Subtotal</th>
+                        <th>Commodity Name</th>
+                        <th>Variant</th>
                         <th>Organic</th>
+                        <th>Color Name</th>
                         <th>QR Code</th>
                         <th>Order Note</th>
                         <th>Status</th>
@@ -597,7 +601,10 @@
                             <td class="text-end">Rp <span t-esc="line.unit_price" t-options="{'widget': 'float', 'precision': 2}"/></td>
                             <td class="text-end"><span t-esc="line.qty" t-options="{'widget': 'float', 'precision': 2}"/></td>
                             <td class="text-end">Rp <span t-esc="line.subtotal" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                            <td><span t-esc="line.commodity_name"/></td>
+                            <td><span t-esc="line.variant"/></td>
                             <td><span t-esc="line.is_organic"/></td>
+                            <td><span t-esc="line.color_name"/></td>
                             <td><span t-esc="line.barcode"/></td>
                             <td><span t-esc="line.note"/></td>
                             <td><span t-esc="purchase_order_uniq.status"/></td>
