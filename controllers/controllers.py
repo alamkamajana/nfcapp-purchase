@@ -202,6 +202,8 @@ class Controller(http.Controller):
             "delivery_order_name": get_delivery_order_name(delivery.delivery_order_uniq_id),
             "barcode": delivery.barcode,
             "qty": delivery.qty,
+            "create_uid": delivery.create_uid.id,
+            "write_uid": delivery.write_uid.id,
         } for delivery in delivery_scans]
 
         return json.dumps(json_delivery_scans)
