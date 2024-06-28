@@ -253,6 +253,8 @@
                 <br/>
 
                 <div>
+                    <input type="hidden" id="USER_ID" t-att-value="env.user.id"/>
+
                     <table class="table table-sm table-bordered border-dark align-middle" style="max-width: 500px;">
                         <thead>
                             <tr style="border-bottom: 1px solid black;">
@@ -275,6 +277,7 @@
                 $(document).ready(function() {
                     $('#barcode').focus();
                     updateDeliveryScanRecord();
+                    const USER_ID = Number($('#USER_ID').val());
 
                     $('#clearInputBtn').on('click', function() {
                         $('#barcode').val('');
@@ -482,60 +485,77 @@
                             success: function(response) {
                                 if (response.length > 0) {
                                     var recordRows = response.map(function(rec) {
-                                        return `
-                                            <tr>
-                                                <td class="ps-2 pe-2">${rec.delivery_order_name}</td>
-                                                <td class="ps-2 pe-2">${rec.barcode}</td>
-                                                <td class="text-end ps-2 pe-2">${rec.qty.toFixed(2)}</td>
-                                                <td class="text-center">
-                                                    <button type="button" class="btn btn-sm btn-danger"
-                                                            data-bs-toggle="modal" data-bs-target="#modal-delete-${rec.id}">
-                                                        <i class="bx bxs-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `;
+                                        if (rec.write_uid === USER_ID) {
+                                            return `
+                                                <tr>
+                                                    <td class="ps-2 pe-2">${rec.delivery_order_name}</td>
+                                                    <td class="ps-2 pe-2">${rec.barcode}</td>
+                                                    <td class="text-end ps-2 pe-2">${rec.qty.toFixed(2)}</td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                                data-bs-toggle="modal" data-bs-target="#modal-delete-${rec.id}">
+                                                            <i class="bx bxs-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        } else {
+                                            return `
+                                                <tr>
+                                                    <td class="ps-2 pe-2">${rec.delivery_order_name}</td>
+                                                    <td class="ps-2 pe-2">${rec.barcode}</td>
+                                                    <td class="text-end ps-2 pe-2">${rec.qty.toFixed(2)}</td>
+                                                    <td class="text-center">
+
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }
                                     }).join('');
                                     $('#tableDeliveryScanRecord').html(recordRows);
 
                                     var modals = response.map(function(rec) {
-                                        return `
-                                            <div class="modal fade" id="modal-delete-${rec.id}" tabindex="-1" aria-labelledby="modalDeleteLabel-${rec.id}" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h1 class="modal-title fs-5">Delete Scan</h1>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <h6>Are you sure you want to delete scan:</h6>
-                                                            <div class="ms-4">
-                                                                <table>
-                                                                    <tr>
-                                                                        <td>Delivery</td>
-                                                                        <td>: ${rec.delivery_order_name}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Tag</td>
-                                                                        <td>: ${rec.barcode}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Quantity</td>
-                                                                        <td>: ${rec.qty.toFixed(2)}</td>
-                                                                    </tr>
-                                                                </table>
+                                        if (rec.write_uid === USER_ID) {
+                                            return `
+                                                <div class="modal fade" id="modal-delete-${rec.id}" tabindex="-1" aria-labelledby="modalDeleteLabel-${rec.id}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5">Delete Scan</h1>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                            <button type="button" class="btn btn-danger btn-delete-scan" data-delivery-id="${rec.id}">
-                                                                Delete
-                                                            </button>
+                                                            <div class="modal-body">
+                                                                <h6>Are you sure you want to delete scan:</h6>
+                                                                <div class="ms-4">
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>Delivery</td>
+                                                                            <td>: ${rec.delivery_order_name}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tag</td>
+                                                                            <td>: ${rec.barcode}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Quantity</td>
+                                                                            <td>: ${rec.qty.toFixed(2)}</td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-danger btn-delete-scan" data-delivery-id="${rec.id}">
+                                                                    Delete
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        `;
+                                            `;
+                                        } else {
+                                            return '';
+                                        }
                                     }).join('');
                                     $('#container-modal').append(modals);
                                 } else {
